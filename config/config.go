@@ -1,4 +1,4 @@
-package configs
+package config
 
 import (
 	"errors"
@@ -38,7 +38,7 @@ const (
 var errNotAllowedLoggelLevel = errors.New("not allowed logger level")
 
 func InitConfig() (Config, error) {
-	viper.AddConfigPath("configs")
+	viper.AddConfigPath("config")
 	viper.SetConfigName("config")
 
 	viper.AutomaticEnv()

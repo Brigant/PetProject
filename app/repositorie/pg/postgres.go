@@ -3,7 +3,7 @@ package pg
 import (
 	"fmt"
 
-	"github.com/Brigant/GoPetPorject/configs"
+	"github.com/Brigant/GoPetPorject/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // nececarry blank import
 )
@@ -15,7 +15,7 @@ type Repository struct {
 }
 
 // NewPostgresDB function returns object of datatabase.
-func NewPostgresDB(cfg configs.Config) (*sqlx.DB, error) {
+func NewPostgresDB(cfg config.Config) (*sqlx.DB, error) {
 	database, err := sqlx.Connect("postgres", fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v sslmode=%v",
 		cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Database, cfg.DB.Password, cfg.DB.SSLmode))
 	if err != nil {

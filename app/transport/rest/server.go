@@ -7,7 +7,7 @@ import (
 	"github.com/Brigant/GoPetPorject/app/repositorie/pg"
 	"github.com/Brigant/GoPetPorject/app/service"
 	"github.com/Brigant/GoPetPorject/app/transport/rest/handler"
-	"github.com/Brigant/GoPetPorject/configs"
+	"github.com/Brigant/GoPetPorject/config"
 )
 
 type Server struct {
@@ -26,7 +26,7 @@ func NewServer(port string, router http.Handler) *Server {
 }
 
 func SetupAndRun() error {
-	cfg, err := configs.InitConfig()
+	cfg, err := config.InitConfig()
 	if err != nil {
 		return fmt.Errorf("cannot read config: %w", err)
 	}
