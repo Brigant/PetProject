@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+    psql:
+      image: postgres:15.1
+      container_name: psql
+      environment:
+        POSTGRES_USER: ${DB_USER:-db_user}
+        POSTGRES_PASSWORD: ${DB_PASSWORD:-db_password}
+        POSTGRES_DB: petproject_db
+        PGDATA: /data/postgres
+        TZ: "Europe/Kiev"
+        PGTZ: "Europe/Kiev"
+      ports:
+        - "5432:5432"
+      restart: unless-stopped
+      volumes:
+        - petproject_db:/data/petproject_db
+      healthcheck:
+        test: pg_isready -U ${DB_USER:-db_user} -d ${DB_NAME:-petproject_db}
+        interval: 2s
+        timeout: 4s
+        retries: 5
+
+    migrate:
+      image: migrate/migrate
+      depends_on:
+        psql:
+          condition: service_healthy
+      volumes:
+        - ${MIGRATIONS_HOST_PATH:-./backend/migrations}:/migrations
+      command:
+         [
+          "-path",
+          "/migrations",
+          "-database",
+          "postgres://${DB_USER:-db_user}:${DB_PASSWORD:-db_password}@psql:5432/petproject_db?sslmode=disable",
+          "up"
+        ]
+
+volumes:
+  petproject_db:

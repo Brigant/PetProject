@@ -1,0 +1,14 @@
+version: "3"
+services:
+  migrate:
+        image: migrate/migrate
+        volumes:
+          - ./backend/migrations:/migrations
+        command:
+          [
+            "-path",
+            "/migrations",
+            "-database",
+            "postgres://db_user:db_password@db:5432/petproject_db?sslmode=disable",
+            "down", "2"
+          ]
