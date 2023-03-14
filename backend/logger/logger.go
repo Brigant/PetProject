@@ -18,28 +18,28 @@ func New(logLevel string) (*Logger, error) {
 	}
 
 	cfg := zap.Config{
-		Encoding:          "console",
-		Level:             zap.NewAtomicLevelAt(level),
+		Encoding: "console",
+		Level:    zap.NewAtomicLevelAt(level),
 		Development:       zap.NewDevelopmentConfig().Development,
 		DisableCaller:     zap.NewDevelopmentConfig().DisableCaller,
 		DisableStacktrace: zap.NewDevelopmentConfig().DisableStacktrace,
 		Sampling:          nil,
-		InitialFields:     zap.NewDevelopmentConfig().InitialFields,
+		InitialFields: zap.NewDevelopmentConfig().InitialFields,
 		OutputPaths:       []string{"stderr"},
 		ErrorOutputPaths:  []string{"stderr"},
 		EncoderConfig: zapcore.EncoderConfig{
 			NameKey:        "logger",
-			CallerKey:      "caller",
-			FunctionKey:    zapcore.OmitKey,
-			StacktraceKey:  "stacktrace",
-			MessageKey:     "message",
-			LevelKey:       "level",
+			//CallerKey:      "caller",
+			//EncodeCaller:   zapcore.ShortCallerEncoder,
+			// FunctionKey:    zapcore.OmitKey,
+			StacktraceKey: "stacktrace",
+			LevelKey:      "level",
 			EncodeLevel:    zapcore.CapitalLevelEncoder,
-			TimeKey:        "time",
+			MessageKey:    "message",
+			TimeKey: "time",
 			EncodeTime:     zapcore.ISO8601TimeEncoder,
 			LineEnding:     zapcore.DefaultLineEnding,
 			EncodeDuration: zapcore.SecondsDurationEncoder,
-			EncodeCaller:   zapcore.ShortCallerEncoder,
 		},
 	}
 
@@ -59,34 +59,34 @@ func (l *Logger) Flush() {
 }
 
 // Methods above will implement all needful logging behavior.
-func (l *Logger) Errorf(format string, val ...any) {
-	l.log.Errorf(format, val...)
+func (l *Logger) Errorf(msg string, val ...any) {
+	l.log.Errorf(msg, val...)
 }
 
-func (l *Logger) Errorw(format string, val ...any) {
-	l.log.Errorw(format, val...)
+func (l *Logger) Errorw(msg string, val ...any) {
+	l.log.Errorw(msg, val...)
 }
 
-func (l *Logger) Debugf(format string, val ...any) {
-	l.log.Debugf(format, val...)
+func (l *Logger) Debugf(msg string, val ...any) {
+	l.log.Debugf(msg, val...)
 }
 
-func (l *Logger) Debugw(format string, val ...any) {
-	l.log.Debugw(format, val...)
+func (l *Logger) Debugw(msg string, val ...any) {
+	l.log.Debugw(msg, val...)
 }
 
-func (l *Logger) Infof(format string, val ...any) {
-	l.log.Infof(format, val...)
+func (l *Logger) Infof(msg string, val ...any) {
+	l.log.Infof(msg, val...)
 }
 
-func (l *Logger) Warnf(format string, val ...any) {
-	l.log.Warnf(format, val...)
+func (l *Logger) Warnf(msg string, val ...any) {
+	l.log.Warnf(msg, val...)
 }
 
-func (l *Logger) Warnw(format string, val ...any) {
-	l.log.Warnw(format, val...)
+func (l *Logger) Warnw(msg string, val ...any) {
+	l.log.Warnw(msg, val...)
 }
 
-func (l *Logger) Infow(msg string, keyVal ...any) {
-	l.log.Infow(msg, keyVal...)
+func (l *Logger) Infow(msg string, val ...any) {
+	l.log.Infow(msg, val...)
 }

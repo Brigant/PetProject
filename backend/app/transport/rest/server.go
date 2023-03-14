@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Brigant/GoPetPorject/app/repositorie/pg"
-	"github.com/Brigant/GoPetPorject/app/service"
-	"github.com/Brigant/GoPetPorject/app/transport/rest/handler"
-	"github.com/Brigant/GoPetPorject/config"
+	"github.com/Brigant/GoPetPorject/backend/app/repositorie/pg"
+	"github.com/Brigant/GoPetPorject/backend/app/service"
+	"github.com/Brigant/GoPetPorject/backend/app/transport/rest/handler"
+	"github.com/Brigant/GoPetPorject/backend/config"
+	"github.com/Brigant/GoPetPorject/backend/logger"
 )
 
 type Server struct {
@@ -31,6 +32,13 @@ func SetupAndRun() error {
 		return fmt.Errorf("cannot read config: %w", err)
 	}
 
+	logger, err := logger.New(cfg.LogLevel)
+	if err != nil {
+		return fmt.Errorf("cannot create logger: %w", err)
+	}
+
+	defer logger.Flush()
+
 	db, err := pg.NewPostgresDB(cfg)
 	if err != nil {
 		return fmt.Errorf("error while creating connection to database: %w", err)
@@ -38,15 +46,17 @@ func SetupAndRun() error {
 
 	storage := pg.NewRepository(db)
 
-	services := service.New(service.Deps{
-		AccountStorage:  storage.AccountDB,
-		DirectorStorage: storage.DirectorDB,
-	})
+	services := service.New(
+		service.Deps{
+			AccountStorage:  storage.AccountDB,
+			DirectorStorage: storage.DirectorDB,
+		})
 
-	restHandlers := handler.New(handler.Deps{
-		DirectorService: services.Director,
-		AccountService:  services.Account,
-	})
+	restHandlers := handler.New(
+		handler.Deps{
+			DirectorService: services.Director,
+			AccountService:  services.Account,
+		}, logger)
 
 	routes := restHandlers.InitRouter(cfg.Server.Mode)
 

@@ -3,7 +3,7 @@ package pg
 import (
 	"fmt"
 
-	"github.com/Brigant/GoPetPorject/config"
+	"github.com/Brigant/GoPetPorject/backend/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // nececarry blank import
 )

@@ -3,7 +3,10 @@
 # You may redifine it using os enirenment,
 # for ex.: export SERVER_MODE=release 
 
-loglevel: DEBUG
+loglevel: DEBUG # Available values: INFO, DEBUG, ERROR  
+access_token_ttl: 15 # minutes
+refresh_token_ttl: 24 # hours
+
 
 server:
   mode: "debug"  # Available values: "release" ,"debug" 

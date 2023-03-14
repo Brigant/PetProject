@@ -3,6 +3,7 @@ package handler
 type AccountService interface {
 	CreateUser() error
 	GetUser() error
+	ParseToken(string) (string, string, error)
 }
 
 type DirectorService interface {

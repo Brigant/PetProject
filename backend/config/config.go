@@ -23,9 +23,11 @@ type PostgresConfig struct {
 }
 
 type Config struct {
-	LogLevel string
-	Server   ServerConfig
-	DB       PostgresConfig
+	LogLevel        string
+	AccessTokenTTL  int
+	RefreshTokenTTL int
+	Server          ServerConfig
+	DB              PostgresConfig
 }
 
 // Allowed logger levels & config key.
@@ -38,7 +40,7 @@ const (
 var errNotAllowedLoggelLevel = errors.New("not allowed logger level")
 
 func InitConfig() (Config, error) {
-	viper.AddConfigPath("config")
+	viper.AddConfigPath("backend/config")
 	viper.SetConfigName("config")
 
 	viper.AutomaticEnv()
@@ -53,8 +55,13 @@ func InitConfig() (Config, error) {
 		return Config{}, fmt.Errorf("error while cheking allowed loging leveles: %w", err)
 	}
 
+	accessTTL := viper.GetInt("access_token_ttl")
+	refreshTTL := viper.GetInt("refresh_token_ttl")
+
 	cfg := Config{
-		LogLevel: loglevel,
+		LogLevel:        loglevel,
+		AccessTokenTTL:  accessTTL,
+		RefreshTokenTTL: refreshTTL,
 		Server: ServerConfig{
 			Mode: viper.GetString("server.mode"),
 			Port: viper.GetString("server.port"),
