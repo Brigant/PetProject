@@ -3,6 +3,8 @@ package handler
 import (
 	"github.com/Brigant/GoPetPorject/backend/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 type Deps struct {
@@ -26,8 +28,23 @@ func New(deps Deps, logger *logger.Logger) Handler {
 		Director: NewDirectorHandler(deps.DirectorService),
 		Movie:    NewMovieHandler(deps.MovieService),
 		List:     NewListHandler(deps.ListsService),
-		log: logger,
+		log:      logger,
 	}
+}
+
+var availableRoles = []string{"user", "admin"}
+
+var roleableValues validator.Func = func(fl validator.FieldLevel) bool {
+	role, ok := fl.Field().Interface().(string)
+	if ok {
+		for _, r := range availableRoles {
+			if r == role {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func (h *Handler) InitRouter(mode string) *gin.Engine {
@@ -36,6 +53,10 @@ func (h *Handler) InitRouter(mode string) *gin.Engine {
 	}
 
 	router := gin.New()
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("roleablevalues", roleableValues)
+	}
 
 	router.Use(gin.Recovery(), h.midlewareWithLogger)
 

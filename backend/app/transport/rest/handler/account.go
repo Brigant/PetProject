@@ -41,7 +41,7 @@ func (h AccountHandler) singUp(c *gin.Context) {
 		return
 	}
 
-	// h.logger.Debugw("signUp", "phone", account.Phone, "age", accountser.Age)
+	h.logger.Debugw("signUp", "phone", account.Phone, "age", account.Age)
 
 	userID := h.service.CreateUser()
 	// if err != nil {
