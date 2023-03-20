@@ -3,13 +3,13 @@ package pg
 import (
 	"fmt"
 
-	"github.com/Brigant/GoPetPorject/backend/config"
+	"github.com/Brigant/PetPorject/backend/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // nececarry blank import
 )
 
 type Repository struct {
-	AccountDB  AccountDb
+	AccountDB  AccountDB
 	DirectorDB DirectorDB
 	MovieDB    MovieDB
 }
@@ -28,8 +28,8 @@ func NewPostgresDB(cfg config.Config) (*sqlx.DB, error) {
 // Returns an object of the Ropository.
 func NewRepository(db *sqlx.DB) Repository {
 	return Repository{
-		AccountDB:  NewAccountDb(db),
-		DirectorDB: NewDirectorDb(db),
+		AccountDB:  NewAccountDB(db),
+		DirectorDB: NewDirectorDB(db),
 		MovieDB:    NewMovieDB(db),
 	}
 }

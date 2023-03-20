@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Brigant/GoPetPorject/backend/app/repositorie/pg"
-	"github.com/Brigant/GoPetPorject/backend/app/service"
-	"github.com/Brigant/GoPetPorject/backend/app/transport/rest/handler"
-	"github.com/Brigant/GoPetPorject/backend/config"
-	"github.com/Brigant/GoPetPorject/backend/logger"
+	"github.com/Brigant/PetPorject/backend/app/repositorie/pg"
+	"github.com/Brigant/PetPorject/backend/app/service"
+	"github.com/Brigant/PetPorject/backend/app/transport/rest/handler"
+	"github.com/Brigant/PetPorject/backend/config"
+	"github.com/Brigant/PetPorject/backend/logger"
 )
 
 type Server struct {

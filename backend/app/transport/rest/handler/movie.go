@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 type MovieHandler struct {
 	service MovieService
 }
@@ -26,4 +25,3 @@ func (h *MovieHandler) get(c *gin.Context) {
 func (h *MovieHandler) getAll(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"getAll": "res"})
 }
-

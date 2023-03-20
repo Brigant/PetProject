@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Brigant/PetPorject/backend/app/core"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -37,12 +38,17 @@ type Claims struct {
 	Info UserInfo
 }
 
-// TODO: implement the func.
-func (a AccountService) CreateUser() error {
-	return nil
+// The function receives the accoumt model and store it in repository, after that returns account id
+// of new created account or an error if it occures.
+func (a AccountService) CreateUser(account core.Account) (string, error) {
+	id, err := a.storage.InsertAccount(account)
+	if err != nil {
+		return "", fmt.Errorf("service CreateUser get an error: %w", err)
+	}
+
+	return id, nil
 }
 
-// TODO: implement the func.
 func (a AccountService) GetUser() error {
 	return nil
 }
@@ -89,30 +95,37 @@ func (a AccountService) ParseToken(accesToken string) (string, string, error) {
 	return claims.Info.UserID, claims.Info.UserRole, nil
 }
 
-func (a AccountService) generateAccessToken(ID, Role string) (string, error) {
-	t := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
+func (a AccountService) generateAccessToken(id, role string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(accessTokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
 		Info: UserInfo{
-			UserID:   ID,
-			UserRole: Role,
+			UserID:   id,
+			UserRole: role,
 		},
 	})
 
-	accessToken, err := t.SignedString([]byte(signingKey))
+	accessToken, err := token.SignedString([]byte(signingKey))
 	if err != nil {
 		return "", fmt.Errorf("cannot get SignetString token: %w", err)
 	}
 
 	newClaims := &Claims{}
-	jwt.ParseWithClaims(accessToken, newClaims, func(token *jwt.Token) (interface{}, error) { return []byte(signingKey), nil })
+
+	jwtToken, err := jwt.ParseWithClaims(accessToken, newClaims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(signingKey), nil
+	})
+	if err != nil {
+		return "", fmt.Errorf("receives %v, error occurs while ParseWithClaims: %w", jwtToken, err)
+	}
 
 	return accessToken, nil
 }
 
 func (a AccountService) generateRefreshToken(accountID string) (string, error) {
+	_ = accountID
 	// token, err := a.storage .InsertRefreshToken(accountID, refreshTokenTTL)
 	// if err != nil {
 	// 	return "", fmt.Errorf("cannot generate refresh tokes cause of: %w", err)

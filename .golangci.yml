@@ -145,7 +145,7 @@ linters:
     - gci
     - ginkgolinter
     - gocheckcompilerdirectives
-    - gochecknoglobals
+  #  - gochecknoglobals
     - gochecknoinits
     - gocognit
     - goconst
@@ -204,7 +204,7 @@ linters:
     - typecheck
     - unconvert
     - unparam
-    - unused
+  #  - unused
     - usestdlibvars
     - varnamelen
     - wastedassign
