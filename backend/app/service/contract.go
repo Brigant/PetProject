@@ -1,7 +1,9 @@
 package service
 
+import "github.com/Brigant/PetPorject/backend/app/core"
+
 type AccountStorage interface {
-	InsertAccount() error
+	InsertAccount(account core.Account) (id string, err error)
 	SelectAccount() error
 }
 

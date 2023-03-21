@@ -81,7 +81,7 @@ func (h Handler) adminIdentity(c *gin.Context) {
 
 		return
 	}
-	
+
 	if role != roleAdmin {
 		h.log.Debugw("adminIdentity", "error", errNotAdmin.Error())
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{

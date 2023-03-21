@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/Brigant/GoPetPorject/backend/app/transport/rest"
+	"github.com/Brigant/PetPorject/backend/app/transport/rest"
 )
 
 func main() {

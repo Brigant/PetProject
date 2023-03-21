@@ -1,8 +1,12 @@
 package handler
 
 import (
-	"github.com/Brigant/GoPetPorject/backend/logger"
+	"errors"
+
+	"github.com/Brigant/PetPorject/backend/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 type Deps struct {
@@ -26,9 +30,26 @@ func New(deps Deps, logger *logger.Logger) Handler {
 		Director: NewDirectorHandler(deps.DirectorService),
 		Movie:    NewMovieHandler(deps.MovieService),
 		List:     NewListHandler(deps.ListsService),
-		log: logger,
+		log:      logger,
 	}
 }
+
+var (
+	availableRoles                  = []string{"user", "admin"}
+	errValidatorBind                = errors.New("can't bind the validator")
+	checkRoleFunc    validator.Func = func(fl validator.FieldLevel) bool {
+		role, ok := fl.Field().Interface().(string)
+		if ok {
+			for _, r := range availableRoles {
+				if r == role {
+					return true
+				}
+			}
+		}
+
+		return false
+	}
+)
 
 func (h *Handler) InitRouter(mode string) *gin.Engine {
 	if mode == "release" {
@@ -36,6 +57,12 @@ func (h *Handler) InitRouter(mode string) *gin.Engine {
 	}
 
 	router := gin.New()
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		if err := v.RegisterValidation("checkRole", checkRoleFunc); err != nil {
+			h.log.Errorw("bind validator", "err", errValidatorBind.Error())
+		}
+	}
 
 	router.Use(gin.Recovery(), h.midlewareWithLogger)
 
@@ -58,7 +85,6 @@ func (h *Handler) InitRouter(mode string) *gin.Engine {
 		movie.POST("/", h.Movie.create)
 		movie.GET("/{id}", h.Movie.get)
 		movie.GET("/", h.Movie.getAll)
-
 	}
 
 	list := router.Group("list")

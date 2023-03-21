@@ -1,7 +1,11 @@
 package handler
 
+import "github.com/Brigant/PetPorject/backend/app/core"
+
+//go:generate mockgen -source=./contract.go -destination=./mocks/contract_mock_test.go -package=handler
+
 type AccountService interface {
-	CreateUser() error
+	CreateUser(account core.Account) (id string, err error)
 	GetUser() error
 	ParseToken(string) (string, string, error)
 }
