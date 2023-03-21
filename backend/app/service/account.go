@@ -38,8 +38,8 @@ type Claims struct {
 	Info UserInfo
 }
 
-// The function receives the accoumt model and store it in repository, after that returns account id
-// of new created account or an error if it occures.
+// The function receives the account model and store it in the repository, after that returns account id
+// of the new created account or an error if it occures.
 func (a AccountService) CreateUser(account core.Account) (string, error) {
 	id, err := a.storage.InsertAccount(account)
 	if err != nil {
