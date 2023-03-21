@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -126,6 +127,21 @@ func TestAccountHandler_singUp(t *testing.T) {
 			mockBehavior: func(s *MockAccountService, account core.Account) {},
 			expectedStatusCode:  400,
 			expectedRequestBody: `{"error":"Key: 'Account.Role' Error:Field validation for 'Role' failed on the 'checkRole' tag"}`,
+		},
+		"service Failure": {
+			logger:    log,
+			inputBody: `{"phone":"+399999999","password":"password1234","age":15,"role":"admin"}`,
+			account: core.Account{
+				Phone:    "+399999999",
+				Password: "password1234",
+				Age:      15,
+				Role:     "admin",
+			},
+			mockBehavior: func(s *MockAccountService, account core.Account) {
+				s.EXPECT().CreateUser(account).Return("", errors.New("service failure"))
+			},
+			expectedStatusCode:  500,
+			expectedRequestBody: `{"error":"service failure"}`,
 		},
 	}
 
