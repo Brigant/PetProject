@@ -71,7 +71,7 @@ func (h *Handler) InitRouter(mode string) *gin.Engine {
 		auth.POST("/", h.Account.singUp)
 		auth.POST("/login", h.Account.login)
 		auth.GET("/logout", h.Account.logout)
-		auth.POST("/refress", h.Account.refreshToken)
+		auth.POST("/refresh", h.Account.refreshToken)
 	}
 
 	director := router.Group("/director")
