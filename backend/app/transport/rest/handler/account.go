@@ -21,7 +21,7 @@ func NewAccountHandler(s AccountService, logger *logger.Logger) AccountHandler {
 	}
 }
 
-type signInInput struct {
+type inputAccountData struct {
 	Phone    string
 	Password string
 }
@@ -65,7 +65,39 @@ func (h AccountHandler) singUp(c *gin.Context) {
 }
 
 func (h AccountHandler) login(c *gin.Context) {
-	c.JSON(http.StatusCreated, gin.H{"get": "res"})
+	session := core.Session{
+		RequestHost: c.Request.Host,
+		ClientIP:    c.ClientIP(),
+		UserAgent:   c.Request.UserAgent(),
+	}
+
+	var accInputData inputAccountData
+
+	if err := c.ShouldBindJSON(&accInputData); err != nil {
+		h.logger.Debugw("ShouldBindJSON", "err", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	tokenPair, err := h.service.Login(accInputData.Phone, accInputData.Password, session)
+	if err != nil {
+		if errors.Is(err, core.ErrUserNotFound) {
+			h.logger.Debugw("Login", "alert", err.Error())
+			c.JSON(http.StatusNotFound, err.Error())
+
+			return
+		}
+
+		h.logger.Errorw("Login", "error", err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.JSON(http.StatusOK, tokenPair)
 }
 
 func (h AccountHandler) refreshToken(c *gin.Context) {

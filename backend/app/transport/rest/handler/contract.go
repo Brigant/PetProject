@@ -6,7 +6,7 @@ import "github.com/Brigant/PetPorject/backend/app/core"
 
 type AccountService interface {
 	CreateUser(account core.Account) (id string, err error)
-	GetUser() error
+	Login(login, password string, session core.Session) (core.TokenPair, error)
 	ParseToken(string) (string, string, error)
 }
 

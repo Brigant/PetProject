@@ -49,18 +49,19 @@ func (mr *MockAccountServiceMockRecorder) CreateUser(account interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockAccountService)(nil).CreateUser), account)
 }
 
-// GetUser mocks base method.
-func (m *MockAccountService) GetUser() error {
+// Login mocks base method.
+func (m *MockAccountService) Login(login, password string, session core.Session) (core.TokenPair, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUser")
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "Login", login, password, session)
+	ret0, _ := ret[0].(core.TokenPair)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// GetUser indicates an expected call of GetUser.
-func (mr *MockAccountServiceMockRecorder) GetUser() *gomock.Call {
+// Login indicates an expected call of Login.
+func (mr *MockAccountServiceMockRecorder) Login(login, password, session interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockAccountService)(nil).GetUser))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockAccountService)(nil).Login), login, password, session)
 }
 
 // ParseToken mocks base method.
