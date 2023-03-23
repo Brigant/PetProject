@@ -61,7 +61,7 @@ func (a AccountService) Login(phone, password string, session core.Session) (cor
 		return core.TokenPair{}, fmt.Errorf("service Login got the error: %w", err)
 	}
 
-	if core.SHA256(password) != account.Password {
+	if core.SHA256(password, core.Salt) != account.Password {
 		return core.TokenPair{}, core.ErrWrongPassword
 	}
 

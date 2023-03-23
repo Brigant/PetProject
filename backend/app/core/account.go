@@ -21,14 +21,16 @@ type TokenPair struct {
 	RefreshToken string
 }
 
+const Salt = "BlaBlaBla"
+
 var (
 	ErrDuplicatePhone = errors.New("phone is already exists in the database")
 	ErrUserNotFound   = errors.New("user is not found with such credentials")
 	ErrWrongPassword  = errors.New("wrong passord")
 )
 
-func SHA256(password string) string {
-	sum := sha256.Sum256([]byte(password))
+func SHA256(password, salt string) string {
+	sum := sha256.Sum256([]byte(password + salt))
 
 	return fmt.Sprintf("%x", sum)
 }

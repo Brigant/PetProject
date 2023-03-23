@@ -36,7 +36,7 @@ func (r AccountDB) InsertAccount(account core.Account) (string, error) {
 
 	err := r.db.DB.QueryRow(query,
 		account.Phone,
-		core.SHA256(account.Password),
+		core.SHA256(account.Password, core.Salt),
 		account.Age,
 		account.Role).Scan(&id)
 	if err != nil {
