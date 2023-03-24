@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -177,6 +178,154 @@ func TestAccountHandler_singUp(t *testing.T) {
 
 			// Perform Request
 			r.ServeHTTP(w, req)
+
+			// Assert
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedRequestBody, w.Body.String())
+		})
+	}
+}
+
+func TestAccountHendler_login(t *testing.T) {
+	log, err := logger.New("ERROR")
+	if err != nil {
+		t.FailNow()
+	}
+
+	type mockBehavior func(s *MockAccountService,
+		phone, password string,
+		c *gin.Context,
+	)
+
+	testCasesTable := map[string]struct {
+		logger              *logger.Logger
+		inputBody           string
+		phone               string
+		password            string
+		session             core.Session
+		mockBehavior        mockBehavior
+		expectedStatusCode  int
+		expectedRequestBody string
+	}{
+		"Success": {
+			logger:    log,
+			inputBody: `{"phone":"+399999999","password":"password1234"}`,
+			phone:     "+399999999",
+			password:  "password1234",
+			session:   core.Session{},
+			mockBehavior: func(s *MockAccountService, phone, password string, c *gin.Context) {
+				session := core.Session{
+					RequestHost: c.Request.Host,
+					UserAgent:   c.Request.UserAgent(),
+					ClientIP:    c.ClientIP(),
+				}
+				s.EXPECT().Login(phone, password, session).Return(core.TokenPair{
+					AccessToken:  "SomeAccesToken",
+					RefreshToken: "SomeRefreshToken",
+				}, nil)
+			},
+			expectedStatusCode:  200,
+			expectedRequestBody: `{"AccessToken":"SomeAccesToken","RefreshToken":"SomeRefreshToken"}`,
+		},
+		"Wrong request body": {
+			logger:    log,
+			inputBody: `{"phone":"+399999999","password":"password1234"`,
+			phone:     "+399999999",
+			password:  "password1234",
+			session:   core.Session{},
+			mockBehavior: func(s *MockAccountService, phone, password string, c *gin.Context) {
+			},
+			expectedStatusCode:  400,
+			expectedRequestBody: `{"error":"unexpected EOF"}`,
+		},
+		"Required password": {
+			logger:    log,
+			inputBody: `{"phone":"+399999999"}`,
+			phone:     "+399999999",
+			password:  "password1234",
+			session:   core.Session{},
+			mockBehavior: func(s *MockAccountService, phone, password string, c *gin.Context) {
+			},
+			expectedStatusCode:  400,
+			expectedRequestBody: `{"error":"Key: 'inputAccountData.Password' Error:Field validation for 'Password' failed on the 'required' tag"}`,
+		},
+		"Required phone": {
+			logger:    log,
+			inputBody: `{"password":"password1234"}`,
+			phone:     "+399999999",
+			password:  "password1234",
+			session:   core.Session{},
+			mockBehavior: func(s *MockAccountService, phone, password string, c *gin.Context) {
+			},
+			expectedStatusCode:  400,
+			expectedRequestBody: `{"error":"Key: 'inputAccountData.Phone' Error:Field validation for 'Phone' failed on the 'required' tag"}`,
+		},
+		"Wrong phone": {
+			logger:    log,
+			inputBody: `{"phone":"399999999","password":"password1234"}`,
+			phone:     "+399999999",
+			password:  "password1234",
+			session:   core.Session{},
+			mockBehavior: func(s *MockAccountService, phone, password string, c *gin.Context) {
+			},
+			expectedStatusCode:  400,
+			expectedRequestBody: `{"error":"Key: 'inputAccountData.Phone' Error:Field validation for 'Phone' failed on the 'e164' tag"}`,
+		},
+		"Short password": {
+			logger:    log,
+			inputBody: `{"phone":"+399999999","password":"1234"}`,
+			phone:     "+399999999",
+			password:  "password1234",
+			session:   core.Session{},
+			mockBehavior: func(s *MockAccountService, phone, password string, c *gin.Context) {
+			},
+			expectedStatusCode:  400,
+			expectedRequestBody: `{"error":"Key: 'inputAccountData.Password' Error:Field validation for 'Password' failed on the 'min' tag"}`,
+		},
+		"Not ASCI password": {
+			logger:    log,
+			inputBody: `{"phone":"+399999999","password":"Парольsd1234"}`,
+			phone:     "+399999999",
+			password:  "password1234",
+			session:   core.Session{},
+			mockBehavior: func(s *MockAccountService, phone, password string, c *gin.Context) {
+			},
+			expectedStatusCode:  400,
+			expectedRequestBody: `{"error":"Key: 'inputAccountData.Password' Error:Field validation for 'Password' failed on the 'ascii' tag"}`,
+		},	
+	}
+
+	for name, testCase := range testCasesTable {
+		t.Run(name, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+
+			// Init Deps.
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			accountService := NewMockAccountService(ctrl)
+
+			accountHandler := AccountHandler{
+				service: accountService,
+				logger:  testCase.logger,
+			}
+
+			w := httptest.NewRecorder()
+
+			c, r := gin.CreateTestContext(w)
+			
+			c.Request = httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer([]byte(testCase.inputBody)))
+
+			testCase.mockBehavior(accountService,
+				testCase.phone,
+				testCase.password,
+				c,
+			)
+
+			r.POST("/login", accountHandler.login)
+
+			// Perform Request
+			r.ServeHTTP(w, c.Request)
 
 			// Assert
 			assert.Equal(t, testCase.expectedStatusCode, w.Code)

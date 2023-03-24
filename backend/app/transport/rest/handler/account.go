@@ -22,8 +22,8 @@ func NewAccountHandler(s AccountService, logger *logger.Logger) AccountHandler {
 }
 
 type inputAccountData struct {
-	Phone    string
-	Password string
+	Phone    string `binding:"required,e164,lowercase"`
+	Password string `binding:"required,min=8,max=255,ascii"`
 }
 
 type inputRefreshToken struct {
