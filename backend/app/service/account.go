@@ -84,27 +84,6 @@ func (a AccountService) Login(phone, password string, session core.Session) (cor
 	return tokenPair, nil
 }
 
-// The function GenerateToken represents bissness logic layer
-// and  generate token.
-// func (a AccountService) GenerateTokens(phone, password string) (string, string, error) {
-// 	user, err := a.storage.SelectAccount(phone)
-// 	if err != nil {
-// 		return "", "", fmt.Errorf("error occures while GetUser: %w", err)
-// 	}
-
-// 	accessToken, err := a.generateAccessToken(user.ID, user.Role)
-// 	if err != nil {
-// 		return "", "", fmt.Errorf("cerror occures while generateAccessToken: %w", err)
-// 	}
-
-// 	refreshToken, err := a.generateRefreshToken(user.ID)
-// 	if err != nil {
-// 		return "", "", fmt.Errorf("error occures while generateRefreshToken: %w", err)
-// 	}
-
-// 	return accessToken, refreshToken, nil
-// }
-
 // The function returns user ID if accessToken is valid.
 func (a AccountService) ParseToken(accesToken string) (string, string, error) {
 	_ = accesToken
@@ -147,14 +126,14 @@ func (a AccountService) generateAccessToken(account core.Account, session core.S
 		return "", fmt.Errorf("cannot get SignetString token: %w", err)
 	}
 
-	newClaims := &Claims{}
+	// newClaims := &Claims{}
 
-	jwtToken, err := jwt.ParseWithClaims(accessToken, newClaims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(signingKey), nil
-	})
-	if err != nil {
-		return "", fmt.Errorf("receives %v, error occurs while ParseWithClaims: %w", jwtToken, err)
-	}
+	// jwtToken, err := jwt.ParseWithClaims(accessToken, newClaims, func(token *jwt.Token) (interface{}, error) {
+	// 	return []byte(signingKey), nil
+	// })
+	// if err != nil {
+	// 	return "", fmt.Errorf("receives %v, error occurs while ParseWithClaims: %w", jwtToken, err)
+	// }
 
 	return accessToken, nil
 }
