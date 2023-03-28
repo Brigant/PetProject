@@ -9,11 +9,12 @@ import (
 )
 
 const (
-	athoriazahionHeader = "Authorization"
-	userCtx             = "userID"
-	roleCtx             = "userRole"
-	headerPartsNumber   = 2
-	roleAdmin           = "admin"
+	authoriazahionHeader = "Authorization"
+	authorizationType    = "Bearer"
+	userCtx              = "userID"
+	roleCtx              = "userRole"
+	headerPartsNumber    = 2
+	roleAdmin            = "admin"
 )
 
 var (
@@ -32,8 +33,9 @@ func (h Handler) midlewareWithLogger(c *gin.Context) {
 	c.Next()
 }
 
+// The middleware checks if there is some registred user.
 func (h Handler) userIdentity(c *gin.Context) {
-	header := c.GetHeader(athoriazahionHeader)
+	header := c.GetHeader(authoriazahionHeader)
 	if header == "" {
 		h.log.Debugw("userIdentify", "error", errEmptyHeader.Error())
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -45,6 +47,24 @@ func (h Handler) userIdentity(c *gin.Context) {
 
 	headerParts := strings.Split(header, " ")
 	if len(headerParts) != headerPartsNumber {
+		h.log.Debugw("userIdentify", "error", errInvalidHeader.Error())
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": errInvalidHeader.Error(),
+		})
+
+		return
+	}
+
+	if headerParts[0] != authorizationType {
+		h.log.Debugw("userIdentify", "error", errInvalidHeader.Error())
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": errInvalidHeader.Error(),
+		})
+
+		return
+	}
+
+	if headerParts[1] == "" {
 		h.log.Debugw("userIdentify", "error", errInvalidHeader.Error())
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": errInvalidHeader.Error(),
@@ -70,8 +90,6 @@ func (h Handler) userIdentity(c *gin.Context) {
 // This midleware implement the functionality of userIdentity
 // and also check the admin role is present.
 func (h Handler) adminIdentity(c *gin.Context) {
-	h.userIdentity(c)
-
 	role, exist := c.Get(roleCtx)
 	if !exist {
 		h.log.Debugw("adminIdentity", "error", errEmptyRole.Error())

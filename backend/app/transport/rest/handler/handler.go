@@ -24,7 +24,7 @@ type Handler struct {
 	log      *logger.Logger
 }
 
-func New(deps Deps, logger *logger.Logger) Handler {
+func NewHandler(deps Deps, logger *logger.Logger) Handler {
 	return Handler{
 		Account:  NewAccountHandler(deps.AccountService, logger),
 		Director: NewDirectorHandler(deps.DirectorService),
@@ -70,24 +70,24 @@ func (h *Handler) InitRouter(mode string) *gin.Engine {
 	{
 		auth.POST("/", h.Account.singUp)
 		auth.POST("/login", h.Account.login)
-		auth.GET("/logout", h.Account.logout)
+		auth.GET("/logout", h.userIdentity, h.Account.logout)
 		auth.POST("/refresh", h.Account.refreshToken)
 	}
 
-	director := router.Group("/director")
+	director := router.Group("/director", h.userIdentity)
 	{
-		director.POST("/", h.Director.create)
+		director.POST("/", h.adminIdentity, h.Director.create)
 		director.GET("/", h.Director.get)
 	}
 
-	movie := router.Group("/movie")
+	movie := router.Group("/movie", h.userIdentity)
 	{
-		movie.POST("/", h.Movie.create)
+		movie.POST("/", h.adminIdentity, h.Movie.create)
 		movie.GET("/{id}", h.Movie.get)
 		movie.GET("/", h.Movie.getAll)
 	}
 
-	list := router.Group("list")
+	list := router.Group("list", h.userIdentity)
 	{
 		list.POST("/", h.List.create)
 		list.GET("/{id}", h.List.get)

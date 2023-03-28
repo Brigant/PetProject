@@ -86,23 +86,23 @@ func (a AccountService) Login(phone, password string, session core.Session) (cor
 
 // The function returns user ID if accessToken is valid.
 func (a AccountService) ParseToken(accesToken string) (string, string, error) {
-	_ = accesToken
-	// token, err := jwt.ParseWithClaims(accesToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-	// 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-	// 		return nil, errInvalidSigningMethod
-	// 	}
+	token, err := jwt.ParseWithClaims(accesToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errInvalidSigningMethod
+		}
 
-	// 	return []byte(signingKey), nil
-	// })
-	// if err != nil {
-	// 	return "", "", fmt.Errorf("accessToken throws an error during parsing: %w", err)
-	// }
+		return []byte(signingKey), nil
+	})
+	if err != nil {
+		return "", "", fmt.Errorf("accessToken throws an error during parsing: %w", err)
+	}
 
-	// claims, ok := token.Claims.(*Claims)
-	// if !ok {
-	// 	return "", "", errWrongTokenClaimType
-	// }
-	return "claims.Info.UserID", "claims.Info.UserRole", nil
+	claims, ok := token.Claims.(*Claims)
+	if !ok {
+		return "", "", errWrongTokenClaimType
+	}
+
+	return claims.Info.AccountID, claims.Info.Role, nil
 }
 
 func (a AccountService) generateAccessToken(account core.Account, session core.Session) (string, error) {
@@ -125,15 +125,6 @@ func (a AccountService) generateAccessToken(account core.Account, session core.S
 	if err != nil {
 		return "", fmt.Errorf("cannot get SignetString token: %w", err)
 	}
-
-	// newClaims := &Claims{}
-
-	// jwtToken, err := jwt.ParseWithClaims(accessToken, newClaims, func(token *jwt.Token) (interface{}, error) {
-	// 	return []byte(signingKey), nil
-	// })
-	// if err != nil {
-	// 	return "", fmt.Errorf("receives %v, error occurs while ParseWithClaims: %w", jwtToken, err)
-	// }
 
 	return accessToken, nil
 }
