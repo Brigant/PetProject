@@ -52,7 +52,7 @@ func SetupAndRun() error {
 			DirectorStorage: storage.DirectorDB,
 		})
 
-	restHandlers := handler.New(
+	restHandlers := handler.NewHandler(
 		handler.Deps{
 			DirectorService: services.Director,
 			AccountService:  services.Account,
