@@ -28,14 +28,18 @@ var (
 	errWrongTokenClaimType  = errors.New("token claims are not of type *tokenClaims")
 )
 
-type UserInfo struct {
-	UserID   string
-	UserRole string
+type ClinteSideInfo struct {
+	AccountID    string
+	Role         string
+	RefreshToken string
+	RequestHost  string
+	UserAgent    string
+	ClientIP     string
 }
 
 type Claims struct {
 	jwt.StandardClaims
-	Info UserInfo
+	Info ClinteSideInfo
 }
 
 // The function receives the account model and store it in the repository, after that returns account id
@@ -49,61 +53,71 @@ func (a AccountService) CreateUser(account core.Account) (string, error) {
 	return id, nil
 }
 
-func (a AccountService) GetUser() error {
-	return nil
+func (a AccountService) Login(phone, password string, session core.Session) (core.TokenPair, error) {
+	var tokenPair core.TokenPair
+
+	account, err := a.storage.SelectAccountByPhone(phone)
+	if err != nil {
+		return core.TokenPair{}, fmt.Errorf("service Login got the error: %w", err)
+	}
+
+	if core.SHA256(password, core.Salt) != account.Password {
+		return core.TokenPair{}, core.ErrWrongPassword
+	}
+
+	session.AccountID = account.ID
+	session.ExpiredIn = refreshTokenTTL
+
+	session, err = a.storage.InsertSession(session)
+	if err != nil {
+		return core.TokenPair{}, fmt.Errorf("error occures in service Loign: %w", err)
+	}
+
+	accesstoken, err := a.generateAccessToken(account, session)
+	if err != nil {
+		return core.TokenPair{}, fmt.Errorf("error occures in service Loign: %w", err)
+	}
+
+	tokenPair.AccessToken = accesstoken
+	tokenPair.RefreshToken = session.RefreshToken
+
+	return tokenPair, nil
 }
-
-// The function GenerateToken represents bissness logic layer
-// and  generate token.
-// func (a AccountService) GenerateTokens(phone, password string) (string, string, error) {
-// 	user, err := a.storage.SelectAccount(phone, a.sha256(password))
-// 	if err != nil {
-// 		return "", "", fmt.Errorf("error occures while GetUser: %w", err)
-// 	}
-
-// 	accessToken, err := a.generateAccessToken(user.ID, user.Role)
-// 	if err != nil {
-// 		return "", "", fmt.Errorf("cerror occures while generateAccessToken: %w", err)
-// 	}
-
-// 	refreshToken, err := a.generateRefreshToken(user.ID)
-// 	if err != nil {
-// 		return "", "", fmt.Errorf("error occures while generateRefreshToken: %w", err)
-// 	}
-
-// 	return accessToken, refreshToken, nil
-// }
 
 // The function returns user ID if accessToken is valid.
 func (a AccountService) ParseToken(accesToken string) (string, string, error) {
-	token, err := jwt.ParseWithClaims(accesToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errInvalidSigningMethod
-		}
+	_ = accesToken
+	// token, err := jwt.ParseWithClaims(accesToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	// 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+	// 		return nil, errInvalidSigningMethod
+	// 	}
 
-		return []byte(signingKey), nil
-	})
-	if err != nil {
-		return "", "", fmt.Errorf("accessToken throws an error during parsing: %w", err)
-	}
+	// 	return []byte(signingKey), nil
+	// })
+	// if err != nil {
+	// 	return "", "", fmt.Errorf("accessToken throws an error during parsing: %w", err)
+	// }
 
-	claims, ok := token.Claims.(*Claims)
-	if !ok {
-		return "", "", errWrongTokenClaimType
-	}
-
-	return claims.Info.UserID, claims.Info.UserRole, nil
+	// claims, ok := token.Claims.(*Claims)
+	// if !ok {
+	// 	return "", "", errWrongTokenClaimType
+	// }
+	return "claims.Info.UserID", "claims.Info.UserRole", nil
 }
 
-func (a AccountService) generateAccessToken(id, role string) (string, error) {
+func (a AccountService) generateAccessToken(account core.Account, session core.Session) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(accessTokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-		Info: UserInfo{
-			UserID:   id,
-			UserRole: role,
+		Info: ClinteSideInfo{
+			AccountID:    account.ID,
+			Role:         account.Role,
+			RefreshToken: session.RefreshToken,
+			RequestHost:  session.RequestHost,
+			UserAgent:    session.UserAgent,
+			ClientIP:     session.ClientIP,
 		},
 	})
 
@@ -112,24 +126,14 @@ func (a AccountService) generateAccessToken(id, role string) (string, error) {
 		return "", fmt.Errorf("cannot get SignetString token: %w", err)
 	}
 
-	newClaims := &Claims{}
+	// newClaims := &Claims{}
 
-	jwtToken, err := jwt.ParseWithClaims(accessToken, newClaims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(signingKey), nil
-	})
-	if err != nil {
-		return "", fmt.Errorf("receives %v, error occurs while ParseWithClaims: %w", jwtToken, err)
-	}
-
-	return accessToken, nil
-}
-
-func (a AccountService) generateRefreshToken(accountID string) (string, error) {
-	_ = accountID
-	// token, err := a.storage .InsertRefreshToken(accountID, refreshTokenTTL)
+	// jwtToken, err := jwt.ParseWithClaims(accessToken, newClaims, func(token *jwt.Token) (interface{}, error) {
+	// 	return []byte(signingKey), nil
+	// })
 	// if err != nil {
-	// 	return "", fmt.Errorf("cannot generate refresh tokes cause of: %w", err)
+	// 	return "", fmt.Errorf("receives %v, error occurs while ParseWithClaims: %w", jwtToken, err)
 	// }
 
-	return "token", nil
+	return accessToken, nil
 }

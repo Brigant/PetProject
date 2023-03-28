@@ -49,18 +49,34 @@ func (mr *MockAccountStorageMockRecorder) InsertAccount(account interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertAccount", reflect.TypeOf((*MockAccountStorage)(nil).InsertAccount), account)
 }
 
-// SelectAccount mocks base method.
-func (m *MockAccountStorage) SelectAccount() error {
+// InsertSession mocks base method.
+func (m *MockAccountStorage) InsertSession(session core.Session) (core.Session, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectAccount")
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "InsertSession", session)
+	ret0, _ := ret[0].(core.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// SelectAccount indicates an expected call of SelectAccount.
-func (mr *MockAccountStorageMockRecorder) SelectAccount() *gomock.Call {
+// InsertSession indicates an expected call of InsertSession.
+func (mr *MockAccountStorageMockRecorder) InsertSession(session interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectAccount", reflect.TypeOf((*MockAccountStorage)(nil).SelectAccount))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertSession", reflect.TypeOf((*MockAccountStorage)(nil).InsertSession), session)
+}
+
+// SelectAccountByPhone mocks base method.
+func (m *MockAccountStorage) SelectAccountByPhone(phone string) (core.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectAccountByPhone", phone)
+	ret0, _ := ret[0].(core.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectAccountByPhone indicates an expected call of SelectAccountByPhone.
+func (mr *MockAccountStorageMockRecorder) SelectAccountByPhone(phone interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectAccountByPhone", reflect.TypeOf((*MockAccountStorage)(nil).SelectAccountByPhone), phone)
 }
 
 // MockDirectorStorage is a mock of DirectorStorage interface.

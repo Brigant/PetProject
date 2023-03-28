@@ -6,10 +6,13 @@ import (
 )
 
 type Session struct {
-	ID        string        `json:"id"`
-	AccountID string        `json:"account_id"`
-	ExpiredIn time.Duration `json:"expired_in" postgres:"expired_in"`
-	Created   time.Time     `json:"created"`
+	RefreshToken string        `json:"refresh_token"`
+	AccountID    string        `json:"account_id"`
+	RequestHost  string        `json:"request_host"`
+	UserAgent    string        `json:"user_agent"`
+	ClientIP     string        `json:"client_ip"`
+	ExpiredIn    time.Duration `json:"expired_in" postgres:"expired_in"`
+	Created      time.Time     `json:"created"`
 }
 
 var (

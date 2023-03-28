@@ -18,3 +18,5 @@
 .idea
 .env
 config.yml
+coverage.html
+coverage.out

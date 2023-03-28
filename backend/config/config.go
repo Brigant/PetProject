@@ -28,6 +28,7 @@ type Config struct {
 	RefreshTokenTTL int
 	Server          ServerConfig
 	DB              PostgresConfig
+	Salt            string
 }
 
 // Allowed logger levels & config key.
@@ -57,11 +58,13 @@ func InitConfig() (Config, error) {
 
 	accessTTL := viper.GetInt("access_token_ttl")
 	refreshTTL := viper.GetInt("refresh_token_ttl")
+	salt := viper.GetString("salt")
 
 	cfg := Config{
 		LogLevel:        loglevel,
 		AccessTokenTTL:  accessTTL,
 		RefreshTokenTTL: refreshTTL,
+		Salt:            salt,
 		Server: ServerConfig{
 			Mode: viper.GetString("server.mode"),
 			Port: viper.GetString("server.port"),
