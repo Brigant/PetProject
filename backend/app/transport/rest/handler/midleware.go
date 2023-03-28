@@ -91,7 +91,7 @@ func (h Handler) userIdentity(c *gin.Context) {
 // and also check the admin role is present.
 func (h Handler) adminIdentity(c *gin.Context) {
 	role, exist := c.Get(roleCtx)
-	if !exist {
+	if !exist || role == "" {
 		h.log.Debugw("adminIdentity", "error", errEmptyRole.Error())
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": errEmptyRole.Error(),
