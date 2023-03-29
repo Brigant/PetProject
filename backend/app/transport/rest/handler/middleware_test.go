@@ -115,3 +115,55 @@ func TestHandler_UserIdentity(t *testing.T) {
 		})
 	}
 }
+
+func TestHandler_AdminIdentitiy(t *testing.T) {
+	log, err := logger.New("INFO")
+	if err != nil {
+		t.Error("can't initialize logger")
+	}
+
+	tableTestCases := map[string]struct {
+		logger               *logger.Logger
+		role                 string
+		expectedStatusCode   int
+		expectedResponseBody string
+	}{
+		"Empty role": {
+			logger:               log,
+			role:                 "",
+			expectedStatusCode:   401,
+			expectedResponseBody: `{"error":"empty role"}`,
+		},
+		"Invalid role": {
+			logger:               log,
+			role:                 "user",
+			expectedStatusCode:   401,
+			expectedResponseBody: `{"error":"you are not admin"}`,
+		},
+	}
+
+	for name, testCase := range tableTestCases {
+		t.Run(name, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+
+			w := httptest.NewRecorder()
+
+			c, _ := gin.CreateTestContext(w)
+			c.Set(roleCtx, testCase.role)
+
+			middleware := Handler{
+				Account:  AccountHandler{},
+				Director: DirectorHandler{},
+				Movie:    MovieHandler{},
+				List:     ListHandler{},
+				log:      testCase.logger,
+			}
+
+			// Invoke the middleware.
+			middleware.adminIdentity(c)
+
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
+		})
+	}
+}
