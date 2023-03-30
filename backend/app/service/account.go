@@ -65,15 +65,18 @@ func (a AccountService) Login(phone, password string, session core.Session) (cor
 		return core.TokenPair{}, core.ErrWrongPassword
 	}
 
+	expired := time.Now().Add(refreshTokenTTL)
+
 	session.AccountID = account.ID
-	session.ExpiredIn = refreshTokenTTL
+	session.Role = account.Role
+	session.Expired = expired
 
 	session, err = a.storage.InsertSession(session)
 	if err != nil {
 		return core.TokenPair{}, fmt.Errorf("error occures in service Loign: %w", err)
 	}
 
-	accesstoken, err := a.generateAccessToken(account, session)
+	accesstoken, err := a.generateAccessToken(session)
 	if err != nil {
 		return core.TokenPair{}, fmt.Errorf("error occures in service Loign: %w", err)
 	}
@@ -105,15 +108,37 @@ func (a AccountService) ParseToken(accesToken string) (string, string, error) {
 	return claims.Info.AccountID, claims.Info.Role, nil
 }
 
-func (a AccountService) generateAccessToken(account core.Account, session core.Session) (string, error) {
+func (a AccountService) RefreshTokenpair(session core.Session) (core.TokenPair, error) {
+	expired := time.Now().Add(refreshTokenTTL)
+	session.Expired = expired
+
+	curentSession, err := a.storage.RefreshSession(session)
+	if err != nil {
+		return core.TokenPair{}, fmt.Errorf("storege can't refress this session: %w", err)
+	}
+
+	accessToken, err := a.generateAccessToken(curentSession)
+	if err != nil {
+		return core.TokenPair{}, fmt.Errorf("error happened while generating Access Token: %w", err)
+	}
+
+	tokenPair := core.TokenPair{
+		AccessToken:  accessToken,
+		RefreshToken: session.RefreshToken,
+	}
+
+	return tokenPair, nil
+}
+
+func (a AccountService) generateAccessToken(session core.Session) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(accessTokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
 		Info: ClinteSideInfo{
-			AccountID:    account.ID,
-			Role:         account.Role,
+			AccountID:    session.AccountID,
+			Role:         session.Role,
 			RefreshToken: session.RefreshToken,
 			RequestHost:  session.RequestHost,
 			UserAgent:    session.UserAgent,

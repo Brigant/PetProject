@@ -92,7 +92,7 @@ func TestGenerateAccessToken(t *testing.T) {
 				RequestHost:  "example.com",
 				UserAgent:    "Some mozilla agent",
 				ClientIP:     "127.0.0.1",
-				ExpiredIn:    100,
+				Expired:      time.Now().Add(5 * time.Second),
 				Created:      time.Now(),
 			},
 		},
@@ -102,7 +102,7 @@ func TestGenerateAccessToken(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			var accountService AccountService
 
-			accessToken, _ := accountService.generateAccessToken(testCase.account, testCase.session)
+			accessToken, _ := accountService.generateAccessToken(testCase.session)
 
 			token, _ := jwt.ParseWithClaims(accessToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

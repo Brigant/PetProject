@@ -64,6 +64,36 @@ func (mr *MockAccountStorageMockRecorder) InsertSession(session interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertSession", reflect.TypeOf((*MockAccountStorage)(nil).InsertSession), session)
 }
 
+// RefreshSession mocks base method.
+func (m *MockAccountStorage) RefreshSession(session core.Session) (core.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RefreshSession", session)
+	ret0, _ := ret[0].(core.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RefreshSession indicates an expected call of RefreshSession.
+func (mr *MockAccountStorageMockRecorder) RefreshSession(session interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RefreshSession", reflect.TypeOf((*MockAccountStorage)(nil).RefreshSession), session)
+}
+
+// SelectAccountByID mocks base method.
+func (m *MockAccountStorage) SelectAccountByID(accountID string) (core.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectAccountByID", accountID)
+	ret0, _ := ret[0].(core.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectAccountByID indicates an expected call of SelectAccountByID.
+func (mr *MockAccountStorageMockRecorder) SelectAccountByID(accountID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectAccountByID", reflect.TypeOf((*MockAccountStorage)(nil).SelectAccountByID), accountID)
+}
+
 // SelectAccountByPhone mocks base method.
 func (m *MockAccountStorage) SelectAccountByPhone(phone string) (core.Account, error) {
 	m.ctrl.T.Helper()

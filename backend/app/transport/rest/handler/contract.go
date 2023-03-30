@@ -8,6 +8,7 @@ type AccountService interface {
 	CreateUser(account core.Account) (id string, err error)
 	Login(login, password string, session core.Session) (core.TokenPair, error)
 	ParseToken(string) (string, string, error)
+	RefreshTokenpair(session core.Session) (core.TokenPair, error)
 }
 
 type DirectorService interface {

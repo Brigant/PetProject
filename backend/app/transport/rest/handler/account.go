@@ -7,6 +7,7 @@ import (
 	"github.com/Brigant/PetPorject/backend/app/core"
 	"github.com/Brigant/PetPorject/backend/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type AccountHandler struct {
@@ -27,7 +28,7 @@ type inputAccountData struct {
 }
 
 type inputRefreshToken struct {
-	RefreshToken string
+	RefreshToken uuid.UUID `json:"refreshToken"`
 }
 
 func (h AccountHandler) singUp(c *gin.Context) {
@@ -101,7 +102,32 @@ func (h AccountHandler) login(c *gin.Context) {
 }
 
 func (h AccountHandler) refreshToken(c *gin.Context) {
-	c.JSON(http.StatusCreated, gin.H{"get": "res"})
+	var inputRefreshToken inputRefreshToken
+
+	if err := c.ShouldBindJSON(&inputRefreshToken); err != nil {
+		h.logger.Debugw("ShouldBindJSON", "error", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	session := core.Session{
+		RefreshToken: inputRefreshToken.RefreshToken.String(),
+		RequestHost:  c.Request.Host,
+		ClientIP:     c.ClientIP(),
+		UserAgent:    c.Request.UserAgent(),
+	}
+
+	tokenPair, err := h.service.RefreshTokenpair(session)
+	if err != nil {
+		h.logger.Errorw("error happened while RefreshTokenpair", "error", err.Error())
+		// TODO: make researche which err may happened in this case
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	c.JSON(http.StatusCreated, tokenPair)
 }
 
 func (h AccountHandler) logout(c *gin.Context) {

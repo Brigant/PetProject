@@ -80,6 +80,21 @@ func (mr *MockAccountServiceMockRecorder) ParseToken(arg0 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ParseToken", reflect.TypeOf((*MockAccountService)(nil).ParseToken), arg0)
 }
 
+// RefreshTokenpair mocks base method.
+func (m *MockAccountService) RefreshTokenpair(session core.Session) (core.TokenPair, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RefreshTokenpair", session)
+	ret0, _ := ret[0].(core.TokenPair)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RefreshTokenpair indicates an expected call of RefreshTokenpair.
+func (mr *MockAccountServiceMockRecorder) RefreshTokenpair(session interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RefreshTokenpair", reflect.TypeOf((*MockAccountService)(nil).RefreshTokenpair), session)
+}
+
 // MockDirectorService is a mock of DirectorService interface.
 type MockDirectorService struct {
 	ctrl     *gomock.Controller

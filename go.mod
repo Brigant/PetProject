@@ -7,6 +7,7 @@ require (
 	github.com/go-playground/validator/v10 v10.11.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/mock v1.6.0
+	github.com/google/uuid v1.1.2
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.7
 	github.com/spf13/viper v1.15.0
