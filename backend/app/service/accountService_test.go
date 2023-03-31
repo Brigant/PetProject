@@ -89,6 +89,8 @@ func TestGenerateAccessToken(t *testing.T) {
 			},
 			session: core.Session{
 				RefreshToken: "RefreshToken-111",
+				AccountID:  "ID-111",
+				Role: "admin",
 				RequestHost:  "example.com",
 				UserAgent:    "Some mozilla agent",
 				ClientIP:     "127.0.0.1",

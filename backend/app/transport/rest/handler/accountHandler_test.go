@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Brigant/PetPorject/backend/app/core"
 	"github.com/Brigant/PetPorject/backend/logger"
@@ -292,7 +293,7 @@ func TestAccountHendler_login(t *testing.T) {
 			},
 			expectedStatusCode:  400,
 			expectedRequestBody: `{"error":"Key: 'inputAccountData.Password' Error:Field validation for 'Password' failed on the 'ascii' tag"}`,
-		},	
+		},
 	}
 
 	for name, testCase := range testCasesTable {
@@ -313,7 +314,7 @@ func TestAccountHendler_login(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			c, r := gin.CreateTestContext(w)
-			
+
 			c.Request = httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer([]byte(testCase.inputBody)))
 
 			testCase.mockBehavior(accountService,
@@ -323,6 +324,105 @@ func TestAccountHendler_login(t *testing.T) {
 			)
 
 			r.POST("/login", accountHandler.login)
+
+			// Perform Request
+			r.ServeHTTP(w, c.Request)
+
+			// Assert
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedRequestBody, w.Body.String())
+		})
+	}
+}
+
+func TestAccountHendler_refreshToken(t *testing.T) {
+	log, err := logger.New("ERROR")
+	if err != nil {
+		t.FailNow()
+	}
+
+	type mockBehavior func(s *MockAccountService, session core.Session)
+
+	testCasesTable := map[string]struct {
+		logger              *logger.Logger
+		inputBody           string
+		refreshToken        string
+		mockBehavior        mockBehavior
+		expectedStatusCode  int
+		expectedRequestBody string
+	}{
+		"Success": {
+			logger:       log,
+			inputBody:    `{"RefreshToken": "fc182364-7122-4d4b-bd95-552b716224e2"}`,
+			refreshToken: "fc182364-7122-4d4b-bd95-552b716224e2",
+			mockBehavior: func(s *MockAccountService, session core.Session) {
+				s.EXPECT().RefreshTokenpair(session).Return(
+					core.TokenPair{
+						AccessToken:  "SomeAccesToken",
+						RefreshToken: "SomeRefreshToken",
+					}, nil)
+			},
+			expectedStatusCode:  200,
+			expectedRequestBody: `{"AccessToken":"SomeAccesToken","RefreshToken":"SomeRefreshToken"}`,
+		},
+		"Bad refresh token": {
+			logger:              log,
+			inputBody:           `{"RefreshToken": "fc182364-7122-4d4b-bd95-552b716224e2"`,
+			refreshToken:        "fc182364-7122-4d4b-bd95-552b716224e2",
+			mockBehavior:        func(s *MockAccountService, session core.Session) {},
+			expectedStatusCode:  400,
+			expectedRequestBody: `{"error":"unexpected EOF"}`,
+		},
+		"Bad UUID token": {
+			logger:              log,
+			inputBody:           `{"RefreshToken": "fc182364-7122-4d4b-bd95-552b716224e"}`,
+			refreshToken:        "fc182364-7122-4d4b-bd95-552b716224e2",
+			mockBehavior:        func(s *MockAccountService, session core.Session) {},
+			expectedStatusCode:  400,
+			expectedRequestBody: `{"error":"invalid UUID length: 35"}`,
+		},
+		"Bad refreshToken key": {
+			logger:              log,
+			inputBody:           `{"RefreshTokensdf": "fc182364-7122-4d4b-bd95-552b716224e"}`,
+			refreshToken:        "fc182364-7122-4d4b-bd95-552b716224e2",
+			mockBehavior:        func(s *MockAccountService, session core.Session) {},
+			expectedStatusCode:  400,
+			expectedRequestBody: `{"error":"invalid refresh token"}`,
+		},
+	}
+
+	for name, testCase := range testCasesTable {
+		t.Run(name, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			accountService := NewMockAccountService(ctrl)
+
+			accountHandler := AccountHandler{
+				service: accountService,
+				logger:  testCase.logger,
+			}
+
+			w := httptest.NewRecorder()
+
+			c, r := gin.CreateTestContext(w)
+
+			c.Request = httptest.NewRequest(http.MethodPost, "/refreshToken", bytes.NewBuffer([]byte(testCase.inputBody)))
+
+			session := core.Session{
+				RefreshToken: testCase.refreshToken,
+				RequestHost:  c.Request.Host,
+				UserAgent:    c.Request.UserAgent(),
+				ClientIP:     c.ClientIP(),
+				Expired:      time.Time{},
+				Created:      time.Time{},
+			}
+
+			testCase.mockBehavior(accountService, session)
+
+			r.POST("/refreshToken", accountHandler.refreshToken)
 
 			// Perform Request
 			r.ServeHTTP(w, c.Request)
