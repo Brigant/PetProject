@@ -122,26 +122,49 @@ func (r AccountDB) InsertSession(session core.Session) (core.Session, error) {
 	return session, nil
 }
 
-func (r AccountDB) RefreshSession(session core.Session) (core.Session, error) {
-	var accointID, role string
+func (r AccountDB) SelectSession(session core.Session) (core.Session, error) {
+	query := `SELECT  
+		refresh_token, account_id, role, request_host, user_agent, client_ip, expired, created
+		FROM public.session
+		WHERE refresh_token=$1 and request_host=$2 and user_agent=$3 and client_ip=$4`
 
-	query := `UPDATE public.session 
-		SET expired = $1
-		WHERE refresh_token=$2 AND request_host=$3 AND user_agent=$4 AND client_ip=$5
-		RETURNING account_id, role`
-
-	err := r.db.DB.QueryRow(query, session.Expired,
+	err := r.db.DB.QueryRow(
+		query,
 		session.RefreshToken,
 		session.RequestHost,
 		session.UserAgent,
 		session.ClientIP,
-	).Scan(&accointID, &role)
+	).Scan(
+		&session.RefreshToken,
+		&session.AccountID,
+		&session.Role,
+		&session.RequestHost,
+		&session.UserAgent,
+		&session.ClientIP,
+		&session.Expired,
+		&session.Created,
+	)
 	if err != nil {
-		return core.Session{}, fmt.Errorf("can't UPDATE session cuase of: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return core.Session{}, core.ErrSesseionNotFound
+		}
+
+		return core.Session{}, fmt.Errorf("internal error while scanning row: %w", err)
 	}
 
-	session.AccountID = accointID
-	session.Role = role
-
 	return session, nil
+}
+
+func (r AccountDB) RefreshSession(session core.Session) error {
+	query := `UPDATE public.session 
+		SET expired = $1
+		WHERE refresh_token=$2
+		RETURNING account_id, role`
+
+	_, err := r.db.DB.Exec(query, session.Expired, session.RefreshToken)
+	if err != nil {
+		return fmt.Errorf("can't UPDATE session cuase of: %w", err)
+	}
+
+	return nil
 }

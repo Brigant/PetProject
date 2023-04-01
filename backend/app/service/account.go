@@ -26,6 +26,7 @@ const (
 var (
 	errInvalidSigningMethod = errors.New("invalid signing metod")
 	errWrongTokenClaimType  = errors.New("token claims are not of type *tokenClaims")
+	errRefreshTokenExpired  = errors.New("your refresh token expired")
 )
 
 type ClinteSideInfo struct {
@@ -109,15 +110,23 @@ func (a AccountService) ParseToken(accesToken string) (string, string, error) {
 }
 
 func (a AccountService) RefreshTokenpair(session core.Session) (core.TokenPair, error) {
-	expired := time.Now().Add(refreshTokenTTL)
-	session.Expired = expired
+	sessionFromDB, err := a.storage.SelectSession(session)
+	if err != nil {
+		return core.TokenPair{}, fmt.Errorf("can't Select Session: %w", err)
+	}
 
-	curentSession, err := a.storage.RefreshSession(session)
+	if sessionFromDB.Expired.Unix() < time.Now().Unix() {
+		return core.TokenPair{}, core.ErrRefreshTokenExpired
+	}
+
+	sessionFromDB.Expired = time.Now().Add(refreshTokenTTL)
+
+	err = a.storage.RefreshSession(sessionFromDB)
 	if err != nil {
 		return core.TokenPair{}, fmt.Errorf("storege can't refress this session: %w", err)
 	}
 
-	accessToken, err := a.generateAccessToken(curentSession)
+	accessToken, err := a.generateAccessToken(sessionFromDB)
 	if err != nil {
 		return core.TokenPair{}, fmt.Errorf("error happened while generating Access Token: %w", err)
 	}

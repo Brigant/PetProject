@@ -31,6 +31,8 @@ type inputRefreshToken struct {
 	RefreshToken uuid.UUID `json:"refreshToken"`
 }
 
+var errInvalidRefreshToken = errors.New("invalid refresh token")
+
 func (h AccountHandler) singUp(c *gin.Context) {
 	var account core.Account
 
@@ -102,17 +104,26 @@ func (h AccountHandler) login(c *gin.Context) {
 }
 
 func (h AccountHandler) refreshToken(c *gin.Context) {
-	var inputRefreshToken inputRefreshToken
+	var inputToken inputRefreshToken
 
-	if err := c.ShouldBindJSON(&inputRefreshToken); err != nil {
+	if err := c.ShouldBindJSON(&inputToken); err != nil {
 		h.logger.Debugw("ShouldBindJSON", "error", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
 		return
 	}
 
+	var badToken inputRefreshToken
+
+	if inputToken == badToken {
+		h.logger.Debugw("ShouldBindJSON", "error", errInvalidRefreshToken.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": errInvalidRefreshToken.Error()})
+
+		return
+	}
+
 	session := core.Session{
-		RefreshToken: inputRefreshToken.RefreshToken.String(),
+		RefreshToken: inputToken.RefreshToken.String(),
 		RequestHost:  c.Request.Host,
 		ClientIP:     c.ClientIP(),
 		UserAgent:    c.Request.UserAgent(),
@@ -121,13 +132,13 @@ func (h AccountHandler) refreshToken(c *gin.Context) {
 	tokenPair, err := h.service.RefreshTokenpair(session)
 	if err != nil {
 		h.logger.Errorw("error happened while RefreshTokenpair", "error", err.Error())
-		// TODO: make researche which err may happened in this case
+
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
 		return
 	}
 
-	c.JSON(http.StatusCreated, tokenPair)
+	c.JSON(http.StatusOK, tokenPair)
 }
 
 func (h AccountHandler) logout(c *gin.Context) {
