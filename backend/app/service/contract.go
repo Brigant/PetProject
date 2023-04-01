@@ -11,7 +11,8 @@ type AccountStorage interface {
 	SelectAccountByPhone(phone string) (core.Account, error)
 	SelectAccountByID(accountID string) (core.Account, error)
 	InsertSession(session core.Session) (core.Session, error)
-	RefreshSession(session core.Session) (core.Session, error)
+	SelectSession(session core.Session) (core.Session, error)
+	RefreshSession(session core.Session) error
 }
 
 type DirectorStorage interface {

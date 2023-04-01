@@ -132,7 +132,7 @@ func (h AccountHandler) refreshToken(c *gin.Context) {
 	tokenPair, err := h.service.RefreshTokenpair(session)
 	if err != nil {
 		h.logger.Errorw("error happened while RefreshTokenpair", "error", err.Error())
-		// TODO: make researche which err may happened in this case
+
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
 		return

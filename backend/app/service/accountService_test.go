@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateUser(t *testing.T) {
+func TestService_CreateUser(t *testing.T) {
 	type mockBehavior func(s *MockAccountStorage, account core.Account)
 
 	testCasesTable := map[string]struct {
@@ -77,7 +77,7 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
-func TestGenerateAccessToken(t *testing.T) {
+func TestService_GenerateAccessToken(t *testing.T) {
 	testCasesTable := map[string]struct {
 		account core.Account
 		session core.Session
@@ -89,8 +89,8 @@ func TestGenerateAccessToken(t *testing.T) {
 			},
 			session: core.Session{
 				RefreshToken: "RefreshToken-111",
-				AccountID:  "ID-111",
-				Role: "admin",
+				AccountID:    "ID-111",
+				Role:         "admin",
 				RequestHost:  "example.com",
 				UserAgent:    "Some mozilla agent",
 				ClientIP:     "127.0.0.1",
@@ -127,6 +127,162 @@ func TestGenerateAccessToken(t *testing.T) {
 			assert.Equal(t, testCase.session.RequestHost, claims.Info.RequestHost)
 			assert.Equal(t, testCase.session.UserAgent, claims.Info.UserAgent)
 			assert.Equal(t, testCase.session.ClientIP, claims.Info.ClientIP)
+		})
+	}
+}
+
+func TestService_RefreshTokenpair(t *testing.T) {
+	type mockBehaviorInsert func(s *MockAccountStorage, session core.Session)
+	type mockBehaviorRefresh func(s *MockAccountStorage, session core.Session)
+
+	testCasesTable := map[string]struct {
+		session              core.Session
+		behaviorInsert       mockBehaviorInsert
+		behaviorRefresh      mockBehaviorRefresh
+		expectedRefreshToken string
+		expectedErrorMessage string
+	}{
+		"Refresh tokens successfull": {
+			session: core.Session{
+				AccountID:    "Some-ID",
+				Role:         "admin",
+				RefreshToken: "RefreshToken-111",
+				RequestHost:  "example.com",
+				UserAgent:    "Some mozilla agent",
+				ClientIP:     "127.0.0.1",
+			},
+			behaviorInsert: func(s *MockAccountStorage, session core.Session) {
+				s.EXPECT().SelectSession(session).Return(core.Session{
+					RefreshToken: session.RefreshToken,
+					AccountID:    session.AccountID,
+					Role:         session.Role,
+					RequestHost:  session.RequestHost,
+					UserAgent:    session.UserAgent,
+					ClientIP:     session.ClientIP,
+					Expired:      time.Now().Add(5 * time.Minute),
+					Created:      time.Now().Add(-5 * time.Minute),
+				}, nil)
+			},
+			behaviorRefresh: func(s *MockAccountStorage, session core.Session) {
+				s.EXPECT().RefreshSession(gomock.Any()).Return(nil)
+			},
+			expectedRefreshToken: "RefreshToken-111",
+		},
+		"RefreshToken expired": {
+			session: core.Session{
+				AccountID:    "Some-ID",
+				Role:         "admin",
+				RefreshToken: "RefreshToken-111",
+				RequestHost:  "example.com",
+				UserAgent:    "Some mozilla agent",
+				ClientIP:     "127.0.0.1",
+			},
+			behaviorInsert: func(s *MockAccountStorage, session core.Session) {
+				s.EXPECT().SelectSession(session).Return(core.Session{
+					RefreshToken: session.RefreshToken,
+					AccountID:    session.AccountID,
+					Role:         session.Role,
+					RequestHost:  session.RequestHost,
+					UserAgent:    session.UserAgent,
+					ClientIP:     session.ClientIP,
+					Expired:      time.Now().Add(-5 * time.Minute),
+					Created:      time.Now(),
+				}, nil)
+			},
+			behaviorRefresh: func(s *MockAccountStorage, session core.Session) {
+			},
+			expectedRefreshToken: "",
+			expectedErrorMessage: "refresh token has expired",
+		},
+		"No session in DB": {
+			session: core.Session{
+				AccountID:    "Some-ID",
+				Role:         "admin",
+				RefreshToken: "RefreshToken-111",
+				RequestHost:  "example.com",
+				UserAgent:    "Some mozilla agent",
+				ClientIP:     "127.0.0.1",
+			},
+			behaviorInsert: func(s *MockAccountStorage, session core.Session) {
+				s.EXPECT().SelectSession(session).Return(core.Session{}, errors.New("no session"))
+			},
+			behaviorRefresh: func(s *MockAccountStorage, session core.Session) {
+			},
+			expectedRefreshToken: "",
+			expectedErrorMessage: "can't Select Session: no session",
+		},
+		"Error with session ipdate": {
+			session: core.Session{
+				AccountID:    "Some-ID",
+				Role:         "admin",
+				RefreshToken: "RefreshToken-111",
+				RequestHost:  "example.com",
+				UserAgent:    "Some mozilla agent",
+				ClientIP:     "127.0.0.1",
+			},
+			behaviorInsert: func(s *MockAccountStorage, session core.Session) {
+				s.EXPECT().SelectSession(session).Return(core.Session{
+					RefreshToken: session.RefreshToken,
+					AccountID:    session.AccountID,
+					Role:         session.Role,
+					RequestHost:  session.RequestHost,
+					UserAgent:    session.UserAgent,
+					ClientIP:     session.ClientIP,
+					Expired:      time.Now().Add(5 * time.Minute),
+					Created:      time.Now().Add(-5 * time.Minute),
+				}, nil)
+			},
+			behaviorRefresh: func(s *MockAccountStorage, session core.Session) {
+				s.EXPECT().RefreshSession(gomock.Any()).Return(errors.New("error while update"))
+			},
+			expectedRefreshToken: "",
+			expectedErrorMessage: "storege can't refress this session: error while update",
+		},
+	}
+
+	for name, testCase := range testCasesTable {
+		t.Run(name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			accountStorage := NewMockAccountStorage(ctrl)
+			testCase.behaviorInsert(accountStorage, testCase.session)
+			testCase.behaviorRefresh(accountStorage, testCase.session)
+
+			accountService := AccountService{
+				storage: accountStorage,
+			}
+
+			tokenPair, err := accountService.RefreshTokenpair(testCase.session)
+
+			assert.Equal(t, testCase.expectedRefreshToken, tokenPair.RefreshToken)
+
+			if err != nil {
+				assert.Equal(t, testCase.expectedErrorMessage, err.Error())
+			} else {
+				token, _ := jwt.ParseWithClaims(tokenPair.AccessToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+					if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+						return nil, errInvalidSigningMethod
+					}
+
+					return []byte(signingKey), nil
+				})
+
+				claims, ok := token.Claims.(*Claims)
+				if !ok {
+					t.Error(errWrongTokenClaimType.Error())
+				}
+
+				assert.GreaterOrEqual(t, claims.ExpiresAt, claims.IssuedAt,
+					"ExpiresAt cat't be less or equal to IssueAt")
+				assert.Equal(t, testCase.session.AccountID, claims.Info.AccountID)
+				assert.Equal(t, testCase.session.Role, claims.Info.Role)
+				assert.Equal(t, testCase.session.RefreshToken, claims.Info.RefreshToken)
+				assert.Equal(t, testCase.session.RequestHost, claims.Info.RequestHost)
+				assert.Equal(t, testCase.session.UserAgent, claims.Info.UserAgent)
+				assert.Equal(t, testCase.session.ClientIP, claims.Info.ClientIP)
+
+			}
 		})
 	}
 }
