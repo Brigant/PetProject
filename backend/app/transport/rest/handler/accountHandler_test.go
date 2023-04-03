@@ -433,3 +433,98 @@ func TestAccountHendler_refreshToken(t *testing.T) {
 		})
 	}
 }
+
+func TestAccountHandler_logout(t *testing.T) {
+	log, err := logger.New("ERROR")
+	if err != nil {
+		t.FailNow()
+	}
+
+	type mockBehavior func(s *MockAccountService)
+
+	testCasesTable := map[string]struct {
+		logger               *logger.Logger
+		mockBehavior         mockBehavior
+		ctxKey               string
+		ctxVal               any
+		expectedStatusCode   int
+		expectedResponseBody string
+	}{
+		"Successful logout": {
+			logger: log,
+			mockBehavior: func(s *MockAccountService) {
+				s.EXPECT().Logout(gomock.Any()).Return(nil)
+			},
+			ctxKey:               userCtx,
+			ctxVal:               "accountID",
+			expectedStatusCode:   200,
+			expectedResponseBody: `{"action":"successful"}`,
+		},
+		"Bad string accountID": {
+			logger: log,
+			mockBehavior: func(s *MockAccountService) {
+			},
+			ctxKey:               userCtx,
+			ctxVal:               111,
+			expectedStatusCode:   400,
+			expectedResponseBody: `{"error":"accountID is not string"}`,
+		},
+		"No contex in logout": {
+			logger: log,
+			mockBehavior: func(s *MockAccountService) {
+			},
+			ctxKey:               "",
+			expectedStatusCode:   401,
+			expectedResponseBody: `{"error":"unauthenticated"}`,
+		},
+		"Already logouted": {
+			logger: log,
+			mockBehavior: func(s *MockAccountService) {
+				s.EXPECT().Logout(gomock.Any()).Return(core.ErrNoRowsEffected)
+			},
+			ctxKey:               userCtx,
+			ctxVal:               "accountID",
+			expectedStatusCode:   202,
+			expectedResponseBody: `{"error":"no rows effected"}`,
+		},
+		"Some internal error": {
+			logger: log,
+			mockBehavior: func(s *MockAccountService) {
+				s.EXPECT().Logout(gomock.Any()).Return(errors.New("some internal error"))
+			},
+			ctxKey:               userCtx,
+			ctxVal:               "accountID",
+			expectedStatusCode:   500,
+			expectedResponseBody: `{"error":"some internal error"}`,
+		},
+	}
+
+	for name, testCase := range testCasesTable {
+		t.Run(name, func(t *testing.T) {
+			t.Run(name, func(t *testing.T) {
+				gin.SetMode(gin.TestMode)
+
+				ctrl := gomock.NewController(t)
+				defer ctrl.Finish()
+
+				accountService := NewMockAccountService(ctrl)
+				testCase.mockBehavior(accountService)
+
+				accountHandler := AccountHandler{
+					service: accountService,
+					logger:  testCase.logger,
+				}
+
+				w := httptest.NewRecorder()
+
+				c, _ := gin.CreateTestContext(w)
+				c.Set(testCase.ctxKey, testCase.ctxVal)
+
+				accountHandler.logout(c)
+
+				assert.Equal(t, testCase.expectedStatusCode, w.Code)
+				assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
+			})
+		})
+	}
+}

@@ -28,7 +28,7 @@ func New(logLevel string) (*Logger, error) {
 		OutputPaths:       []string{"stderr"},
 		ErrorOutputPaths:  []string{"stderr"},
 		EncoderConfig: zapcore.EncoderConfig{
-			NameKey:        "logger",
+			NameKey: "logger",
 			// StacktraceKey:  "stacktrace",
 			LevelKey:       "level",
 			EncodeLevel:    zapcore.CapitalLevelEncoder,

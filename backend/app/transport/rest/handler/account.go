@@ -28,6 +28,7 @@ type inputAccountData struct {
 }
 
 type inputRefreshToken struct {
+	//nolint:tagliatelle
 	RefreshToken uuid.UUID `json:"refreshToken"`
 }
 
@@ -150,10 +151,22 @@ func (h AccountHandler) logout(c *gin.Context) {
 		return
 	}
 
-	accountID := userID.(string)
+	accountID, isString := userID.(string)
+	if !isString {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "accountID is not string"})
+
+		return
+	}
 
 	if err := h.service.Logout(accountID); err != nil {
 		h.logger.Errorw("logout", "error", err.Error())
+
+		if errors.Is(err, core.ErrNoRowsEffected) {
+			c.JSON(http.StatusAccepted, gin.H{"error": err.Error()})
+
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 
 		return
