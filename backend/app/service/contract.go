@@ -13,6 +13,7 @@ type AccountStorage interface {
 	InsertSession(session core.Session) (core.Session, error)
 	SelectSession(session core.Session) (core.Session, error)
 	RefreshSession(session core.Session) error
+	DeleteSesions(accountID string) error
 }
 
 type DirectorStorage interface {
