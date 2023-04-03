@@ -15,7 +15,9 @@ type AccountDB struct {
 }
 
 func NewAccountDB(db *sqlx.DB) AccountDB {
-	return AccountDB{db: db}
+	return AccountDB{
+		db: db,
+	}
 }
 
 const (
@@ -164,6 +166,29 @@ func (r AccountDB) RefreshSession(session core.Session) error {
 	_, err := r.db.DB.Exec(query, session.Expired, session.RefreshToken)
 	if err != nil {
 		return fmt.Errorf("can't UPDATE session cuase of: %w", err)
+	}
+
+	return nil
+}
+
+func (r AccountDB) DeleteSesions(accountID string) error {
+	const minimalRowEffected = 1
+
+	query := `DELETE FROM public.session
+		Where account_id=$1`
+
+	result, err := r.db.DB.Exec(query, accountID)
+	if err != nil {
+		return fmt.Errorf("error while deleting session: %w ", err)
+	}
+
+	rowAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("unexpected error while RowsAffected: %w", err)
+	}
+
+	if rowAffected < minimalRowEffected {
+		return core.ErrNoRowsEffected
 	}
 
 	return nil

@@ -286,3 +286,53 @@ func TestService_RefreshTokenpair(t *testing.T) {
 		})
 	}
 }
+
+func TestService_logout(t *testing.T) {
+	type mockBehavior func(s *MockAccountStorage, accountID string)
+
+	testCasesTable := map[string]struct {
+		accountID            string
+		mockBehavior         mockBehavior
+		expectedErrorMessage string
+		wantError            bool
+	}{
+		"Succes": {
+			accountID: "id-111",
+			mockBehavior: func(s *MockAccountStorage, accountID string) {
+				s.EXPECT().DeleteSesions(accountID).Return(nil)
+			},
+			expectedErrorMessage: "",
+			wantError:            false,
+		},
+		"Should be an error": {
+			accountID: "id-111",
+			mockBehavior: func(s *MockAccountStorage, accountID string) {
+				s.EXPECT().DeleteSesions(accountID).Return(errors.New("some error"))
+			},
+			expectedErrorMessage: "can't delete the account sessions: some error",
+			wantError:            true,
+		},
+	}
+
+	for name, testCase := range testCasesTable {
+		t.Run(name, func(t *testing.T) {
+			// Init Deps
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			AccountStorage := NewMockAccountStorage(ctrl)
+			testCase.mockBehavior(AccountStorage, testCase.accountID)
+
+			accountService := AccountService{
+				storage: AccountStorage,
+			}
+
+			err := accountService.Logout(testCase.accountID)
+			if testCase.wantError {
+				assert.Equal(t, testCase.expectedErrorMessage, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}

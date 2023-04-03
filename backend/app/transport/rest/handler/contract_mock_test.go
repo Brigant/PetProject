@@ -64,6 +64,20 @@ func (mr *MockAccountServiceMockRecorder) Login(login, password, session interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockAccountService)(nil).Login), login, password, session)
 }
 
+// Logout mocks base method.
+func (m *MockAccountService) Logout(accountID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Logout", accountID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Logout indicates an expected call of Logout.
+func (mr *MockAccountServiceMockRecorder) Logout(accountID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logout", reflect.TypeOf((*MockAccountService)(nil).Logout), accountID)
+}
+
 // ParseToken mocks base method.
 func (m *MockAccountService) ParseToken(arg0 string) (string, string, error) {
 	m.ctrl.T.Helper()

@@ -162,3 +162,11 @@ func (a AccountService) generateAccessToken(session core.Session) (string, error
 
 	return accessToken, nil
 }
+
+func (a AccountService) Logout(acountID string) error {
+	if err := a.storage.DeleteSesions(acountID); err != nil {
+		return fmt.Errorf("can't delete the account sessions: %w", err)
+	}
+
+	return nil
+}

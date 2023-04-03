@@ -19,4 +19,6 @@ type Session struct {
 var (
 	ErrRefreshTokenExpired = errors.New("refresh token has expired")
 	ErrSesseionNotFound    = errors.New("session is not found with such credentials")
+	ErrNotAuthenticated    = errors.New("unauthenticated")
+	ErrNoRowsEffected      = errors.New("no rows effected")
 )

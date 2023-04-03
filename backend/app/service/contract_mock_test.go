@@ -34,6 +34,20 @@ func (m *MockAccountStorage) EXPECT() *MockAccountStorageMockRecorder {
 	return m.recorder
 }
 
+// DeleteSesions mocks base method.
+func (m *MockAccountStorage) DeleteSesions(accountID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSesions", accountID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteSesions indicates an expected call of DeleteSesions.
+func (mr *MockAccountStorageMockRecorder) DeleteSesions(accountID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSesions", reflect.TypeOf((*MockAccountStorage)(nil).DeleteSesions), accountID)
+}
+
 // InsertAccount mocks base method.
 func (m *MockAccountStorage) InsertAccount(account core.Account) (string, error) {
 	m.ctrl.T.Helper()
