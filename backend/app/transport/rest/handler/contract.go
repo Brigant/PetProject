@@ -13,8 +13,10 @@ type AccountService interface {
 }
 
 type DirectorService interface {
-	CreatDirector() error
-	GetDirector() error
+	CreatDirector(director core.Director) error
+	GetDirectorWithName(directorName string) (core.Director, error)
+	GetDirectorWithID(directorID string) (core.Director, error)
+	GetDirectorList() ([]core.Director, error)
 	UpdateDirector() error
 }
 

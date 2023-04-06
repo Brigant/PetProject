@@ -19,7 +19,7 @@ func NewAccountService(storage AccountStorage) AccountService {
 
 const (
 	signingKey      = "sdFWlnxb13t&r"
-	accessTokenTTL  = 15 * time.Minute
+	accessTokenTTL  = 3500 * time.Minute
 	refreshTokenTTL = 24 * time.Hour
 )
 
