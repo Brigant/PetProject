@@ -21,6 +21,8 @@ type Director struct {
 
 var ErrDublicatDirector = errors.New("there is the director with such data")
 
+// Custom unmarshal function, for the custom type BrithDayType,
+// which should format the time.Time field to "2006-01-02" patern.
 func (b *BirthDayType) UnmarshalJSON(data []byte) error {
 	var rawDate string
 	err := json.Unmarshal(data, &rawDate)
@@ -37,6 +39,8 @@ func (b *BirthDayType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// Custom marshal function, for the custom type BrithDayType,
+// which should format the time.Time field to "2006-01-02" patern.
 func (b BirthDayType) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("\"%s\"", b.Time.Format("2006-01-02"))), nil
 }

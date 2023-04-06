@@ -28,6 +28,7 @@ func NewDirectorHandler(s DirectorService, log *logger.Logger) DirectorHandler {
 	}
 }
 
+// Create the director object.
 func (h *DirectorHandler) create(c *gin.Context) {
 	var director core.Director
 
@@ -38,7 +39,7 @@ func (h *DirectorHandler) create(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreatDirector(director); err != nil {
+	if err := h.service.CreateDirector(director); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -46,6 +47,8 @@ func (h *DirectorHandler) create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"action": "successful"})
 }
 
+// Returns the object of the director defined by its ID.
+// The ID should be passed through the URI path.
 func (h *DirectorHandler) get(c *gin.Context) {
 	id, ok := c.Params.Get("id")
 	if !ok {
@@ -76,6 +79,7 @@ func (h *DirectorHandler) get(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// Returns the slice of the directors.
 func (h *DirectorHandler) getAll(c *gin.Context) {
 	directorsList, _ := h.service.GetDirectorList()
 

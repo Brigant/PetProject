@@ -18,10 +18,8 @@ type AccountStorage interface {
 
 type DirectorStorage interface {
 	InsertDirector(director core.Director) error
-	SelectDirectorByName(directorName string) (core.Director, error)
 	SelectDirectorByID(directorID string) (core.Director, error)
 	SelectDirectorList() ([]core.Director, error)
-	UpdateDirector() error
 }
 
 type MovieStorage interface {

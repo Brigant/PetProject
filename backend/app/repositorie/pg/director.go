@@ -17,6 +17,7 @@ func NewDirectorDB(db *sqlx.DB) DirectorDB {
 	return DirectorDB{db: db}
 }
 
+// The method inserts the director to the DB.
 func (d DirectorDB) InsertDirector(director core.Director) error {
 	query := `INSERT INTO public.director(name, birth_date)
 		VALUES($1, $2)`
@@ -38,22 +39,7 @@ func (d DirectorDB) InsertDirector(director core.Director) error {
 	return nil
 }
 
-func (d DirectorDB) SelectDirectorByName(directorName string) (core.Director, error) {
-	query := `SELECT id, name, birth_date, created, modified
-		FROM public.director
-		WHERE name=$1`
-
-	var director core.Director
-
-	err := d.db.DB.QueryRow(query, directorName).Scan(
-		&director.ID, &director.Name, &director.BirthDate, &director.Created, &director.Modified)
-	if err != nil {
-		return core.Director{}, fmt.Errorf("errow while Select director: %w", err)
-	}
-
-	return director, nil
-}
-
+// The method selects the director speciofied by ID and returns it.
 func (d DirectorDB) SelectDirectorByID(directorID string) (core.Director, error) {
 	query := `SELECT id, name, birth_date, created, modified
 		FROM public.director
@@ -70,6 +56,7 @@ func (d DirectorDB) SelectDirectorByID(directorID string) (core.Director, error)
 	return director, nil
 }
 
+// The method grabs the all directors and returns it in the slice.
 func (d DirectorDB) SelectDirectorList() ([]core.Director, error) {
 	query := `SELECT id, name, birth_date::timestamp, created, modified
 		FROM public.director`
@@ -93,8 +80,4 @@ func (d DirectorDB) SelectDirectorList() ([]core.Director, error) {
 	}
 
 	return directorsList, nil
-}
-
-func (d DirectorDB) UpdateDirector() error {
-	return nil
 }

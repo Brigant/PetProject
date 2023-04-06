@@ -13,11 +13,9 @@ type AccountService interface {
 }
 
 type DirectorService interface {
-	CreatDirector(director core.Director) error
-	GetDirectorWithName(directorName string) (core.Director, error)
+	CreateDirector(director core.Director) error
 	GetDirectorWithID(directorID string) (core.Director, error)
 	GetDirectorList() ([]core.Director, error)
-	UpdateDirector() error
 }
 
 type MovieService interface {
