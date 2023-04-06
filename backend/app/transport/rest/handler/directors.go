@@ -46,10 +46,6 @@ func (h *DirectorHandler) create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"action": "successful"})
 }
 
-func (h *DirectorHandler) edit(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"get": "res"})
-}
-
 func (h *DirectorHandler) get(c *gin.Context) {
 	id, ok := c.Params.Get("id")
 	if !ok {
@@ -75,7 +71,9 @@ func (h *DirectorHandler) get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, director)
+	res := []core.Director{director}
+
+	c.JSON(http.StatusOK, res)
 }
 
 func (h *DirectorHandler) getAll(c *gin.Context) {

@@ -21,7 +21,7 @@ func (d DirectorDB) InsertDirector(director core.Director) error {
 	query := `INSERT INTO public.director(name, birth_date)
 		VALUES($1, $2)`
 
-	result, err := d.db.DB.Exec(query, director.Name, director.BirthDate)
+	result, err := d.db.DB.Exec(query, director.Name, director.BirthDate.Time)
 	if err != nil {
 		return fmt.Errorf("can't exec because: %w", err)
 	}
@@ -62,7 +62,7 @@ func (d DirectorDB) SelectDirectorByID(directorID string) (core.Director, error)
 	var director core.Director
 
 	err := d.db.DB.QueryRow(query, directorID).Scan(
-		&director.ID, &director.Name, &director.BirthDate, &director.Created, &director.Modified)
+		&director.ID, &director.Name, &director.BirthDate.Time, &director.Created, &director.Modified)
 	if err != nil {
 		return core.Director{}, fmt.Errorf("errow while Select director: %w", err)
 	}
@@ -71,13 +71,25 @@ func (d DirectorDB) SelectDirectorByID(directorID string) (core.Director, error)
 }
 
 func (d DirectorDB) SelectDirectorList() ([]core.Director, error) {
-	query := `SELECT id, name, birth_date, created, modified
+	query := `SELECT id, name, birth_date::timestamp, created, modified
 		FROM public.director`
 
 	var directorsList []core.Director
 
-	if err := d.db.Select(&directorsList, query); err != nil {
-		return nil, fmt.Errorf("error while Select director list: %w", err)
+	rows, _ := d.db.DB.Query(query)
+	defer rows.Close()
+	for rows.Next() {
+		var director core.Director
+		if err := rows.Scan(
+			&director.ID,
+			&director.Name,
+			&director.BirthDate.Time,
+			&director.Created,
+			&director.Modified); err != nil {
+			return nil, err
+		}
+
+		directorsList = append(directorsList, director)
 	}
 
 	return directorsList, nil

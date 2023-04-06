@@ -77,7 +77,6 @@ func (h *Handler) InitRouter(mode string) *gin.Engine {
 	director := router.Group("/director", h.userIdentity)
 	{
 		director.POST("/", h.adminIdentity, h.Director.create)
-		director.PUT("/", h.adminIdentity, h.Director.edit)
 		director.GET("/:id", h.Director.get)
 		director.GET("/all", h.Director.getAll)
 	}
