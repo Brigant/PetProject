@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/Brigant/PetPorject/backend/app/core"
@@ -9,12 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
-
-type Person struct {
-	Name     string `json:"name"`
-	Age      int    `json:"age"`
-	Location string `json:"location,omitempty"`
-}
 
 type DirectorHandler struct {
 	service DirectorService
@@ -74,17 +67,17 @@ func (h *DirectorHandler) get(c *gin.Context) {
 		return
 	}
 
-	res := []core.Director{director}
-
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, director)
 }
 
 // Returns the slice of the directors.
 func (h *DirectorHandler) getAll(c *gin.Context) {
-	directorsList, _ := h.service.GetDirectorList()
+	directorsList, err := h.service.GetDirectorList()
+	if err != nil {
+		h.logger.Errorw("GetDirectorList", "error", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 
-	for _, director := range directorsList {
-		fmt.Println(director)
+		return
 	}
 
 	c.JSON(http.StatusOK, directorsList)

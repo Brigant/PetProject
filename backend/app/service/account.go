@@ -26,7 +26,6 @@ const (
 var (
 	errInvalidSigningMethod = errors.New("invalid signing metod")
 	errWrongTokenClaimType  = errors.New("token claims are not of type *tokenClaims")
-	errRefreshTokenExpired  = errors.New("your refresh token expired")
 )
 
 type ClinteSideInfo struct {
