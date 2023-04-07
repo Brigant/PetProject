@@ -27,7 +27,7 @@ type Handler struct {
 func NewHandler(deps Deps, logger *logger.Logger) Handler {
 	return Handler{
 		Account:  NewAccountHandler(deps.AccountService, logger),
-		Director: NewDirectorHandler(deps.DirectorService),
+		Director: NewDirectorHandler(deps.DirectorService, logger),
 		Movie:    NewMovieHandler(deps.MovieService),
 		List:     NewListHandler(deps.ListsService),
 		log:      logger,
@@ -77,7 +77,8 @@ func (h *Handler) InitRouter(mode string) *gin.Engine {
 	director := router.Group("/director", h.userIdentity)
 	{
 		director.POST("/", h.adminIdentity, h.Director.create)
-		director.GET("/", h.Director.get)
+		director.GET("/:id", h.Director.get)
+		director.GET("/all", h.Director.getAll)
 	}
 
 	movie := router.Group("/movie", h.userIdentity)

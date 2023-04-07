@@ -19,14 +19,13 @@ func NewAccountService(storage AccountStorage) AccountService {
 
 const (
 	signingKey      = "sdFWlnxb13t&r"
-	accessTokenTTL  = 15 * time.Minute
+	accessTokenTTL  = 3500 * time.Minute
 	refreshTokenTTL = 24 * time.Hour
 )
 
 var (
 	errInvalidSigningMethod = errors.New("invalid signing metod")
 	errWrongTokenClaimType  = errors.New("token claims are not of type *tokenClaims")
-	errRefreshTokenExpired  = errors.New("your refresh token expired")
 )
 
 type ClinteSideInfo struct {

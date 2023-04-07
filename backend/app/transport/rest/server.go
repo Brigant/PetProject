@@ -9,6 +9,7 @@ import (
 	"github.com/Brigant/PetPorject/backend/app/transport/rest/handler"
 	"github.com/Brigant/PetPorject/backend/config"
 	"github.com/Brigant/PetPorject/backend/logger"
+	_ "github.com/lib/pq"
 )
 
 type Server struct {

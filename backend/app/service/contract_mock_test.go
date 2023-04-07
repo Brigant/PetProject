@@ -161,45 +161,47 @@ func (m *MockDirectorStorage) EXPECT() *MockDirectorStorageMockRecorder {
 }
 
 // InsertDirector mocks base method.
-func (m *MockDirectorStorage) InsertDirector() error {
+func (m *MockDirectorStorage) InsertDirector(director core.Director) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InsertDirector")
+	ret := m.ctrl.Call(m, "InsertDirector", director)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InsertDirector indicates an expected call of InsertDirector.
-func (mr *MockDirectorStorageMockRecorder) InsertDirector() *gomock.Call {
+func (mr *MockDirectorStorageMockRecorder) InsertDirector(director interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertDirector", reflect.TypeOf((*MockDirectorStorage)(nil).InsertDirector))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertDirector", reflect.TypeOf((*MockDirectorStorage)(nil).InsertDirector), director)
 }
 
-// SelectDirector mocks base method.
-func (m *MockDirectorStorage) SelectDirector() error {
+// SelectDirectorByID mocks base method.
+func (m *MockDirectorStorage) SelectDirectorByID(directorID string) (core.Director, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectDirector")
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "SelectDirectorByID", directorID)
+	ret0, _ := ret[0].(core.Director)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// SelectDirector indicates an expected call of SelectDirector.
-func (mr *MockDirectorStorageMockRecorder) SelectDirector() *gomock.Call {
+// SelectDirectorByID indicates an expected call of SelectDirectorByID.
+func (mr *MockDirectorStorageMockRecorder) SelectDirectorByID(directorID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectDirector", reflect.TypeOf((*MockDirectorStorage)(nil).SelectDirector))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectDirectorByID", reflect.TypeOf((*MockDirectorStorage)(nil).SelectDirectorByID), directorID)
 }
 
-// UpdateDirector mocks base method.
-func (m *MockDirectorStorage) UpdateDirector() error {
+// SelectDirectorList mocks base method.
+func (m *MockDirectorStorage) SelectDirectorList() ([]core.Director, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateDirector")
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "SelectDirectorList")
+	ret0, _ := ret[0].([]core.Director)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// UpdateDirector indicates an expected call of UpdateDirector.
-func (mr *MockDirectorStorageMockRecorder) UpdateDirector() *gomock.Call {
+// SelectDirectorList indicates an expected call of SelectDirectorList.
+func (mr *MockDirectorStorageMockRecorder) SelectDirectorList() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDirector", reflect.TypeOf((*MockDirectorStorage)(nil).UpdateDirector))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectDirectorList", reflect.TypeOf((*MockDirectorStorage)(nil).SelectDirectorList))
 }
 
 // MockMovieStorage is a mock of MovieStorage interface.

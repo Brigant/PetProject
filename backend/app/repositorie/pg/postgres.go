@@ -21,7 +21,7 @@ func NewPostgresDB(cfg config.Config) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot connect to db: %w", err)
 	}
-
+	
 	return database, nil
 }
 

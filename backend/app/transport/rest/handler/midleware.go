@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	errEmptyHeader   = errors.New("empty header")
+	errEmptyHeader   = errors.New("empty header, expecting Authorization header")
 	errInvalidHeader = errors.New("invalid header")
 	errEmptyRole     = errors.New("empty role")
 	errNotAdmin      = errors.New("you are not admin")

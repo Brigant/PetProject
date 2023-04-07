@@ -132,46 +132,48 @@ func (m *MockDirectorService) EXPECT() *MockDirectorServiceMockRecorder {
 	return m.recorder
 }
 
-// CreatDirector mocks base method.
-func (m *MockDirectorService) CreatDirector() error {
+// CreateDirector mocks base method.
+func (m *MockDirectorService) CreateDirector(director core.Director) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreatDirector")
+	ret := m.ctrl.Call(m, "CreateDirector", director)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// CreatDirector indicates an expected call of CreatDirector.
-func (mr *MockDirectorServiceMockRecorder) CreatDirector() *gomock.Call {
+// CreateDirector indicates an expected call of CreateDirector.
+func (mr *MockDirectorServiceMockRecorder) CreateDirector(director interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatDirector", reflect.TypeOf((*MockDirectorService)(nil).CreatDirector))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDirector", reflect.TypeOf((*MockDirectorService)(nil).CreateDirector), director)
 }
 
-// GetDirector mocks base method.
-func (m *MockDirectorService) GetDirector() error {
+// GetDirectorList mocks base method.
+func (m *MockDirectorService) GetDirectorList() ([]core.Director, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDirector")
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "GetDirectorList")
+	ret0, _ := ret[0].([]core.Director)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// GetDirector indicates an expected call of GetDirector.
-func (mr *MockDirectorServiceMockRecorder) GetDirector() *gomock.Call {
+// GetDirectorList indicates an expected call of GetDirectorList.
+func (mr *MockDirectorServiceMockRecorder) GetDirectorList() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDirector", reflect.TypeOf((*MockDirectorService)(nil).GetDirector))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDirectorList", reflect.TypeOf((*MockDirectorService)(nil).GetDirectorList))
 }
 
-// UpdateDirector mocks base method.
-func (m *MockDirectorService) UpdateDirector() error {
+// GetDirectorWithID mocks base method.
+func (m *MockDirectorService) GetDirectorWithID(directorID string) (core.Director, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateDirector")
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "GetDirectorWithID", directorID)
+	ret0, _ := ret[0].(core.Director)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// UpdateDirector indicates an expected call of UpdateDirector.
-func (mr *MockDirectorServiceMockRecorder) UpdateDirector() *gomock.Call {
+// GetDirectorWithID indicates an expected call of GetDirectorWithID.
+func (mr *MockDirectorServiceMockRecorder) GetDirectorWithID(directorID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDirector", reflect.TypeOf((*MockDirectorService)(nil).UpdateDirector))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDirectorWithID", reflect.TypeOf((*MockDirectorService)(nil).GetDirectorWithID), directorID)
 }
 
 // MockMovieService is a mock of MovieService interface.

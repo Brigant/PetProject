@@ -48,7 +48,7 @@ func TestHandler_UserIdentity(t *testing.T) {
 			headerName:           "",
 			headerValue:          "Bearer token",
 			expectedStatusCode:   401,
-			expectedResponseBody: `{"error":"empty header"}`,
+			expectedResponseBody: `{"error":"empty header, expecting Authorization header"}`,
 		},
 		"Invalid Bearer": {
 			logger:               log,
