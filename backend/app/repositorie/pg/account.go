@@ -20,10 +20,6 @@ func NewAccountDB(db *sqlx.DB) AccountDB {
 	}
 }
 
-const (
-	ErrCodeUniqueViolation = "unique_violation"
-	ErrCodeNoData          = "no_data"
-)
 
 // Insert the account model to databese and returning the newly created account id.
 func (r AccountDB) InsertAccount(account core.Account) (accountID string, err error) {
