@@ -18,11 +18,13 @@ func NewMovieDB(db *sqlx.DB) MovieDB {
 }
 
 func (d MovieDB) InsertMovie(movie core.Movie) error {
+	const expectedEffectedRow = 1
+
 	query := `INSERT INTO public.movie(
 		director_id, title, ganre, rate, release_date, duration)
-		VALUES (:director_id, :title, :ganre, :rate, :release_date, :duration);`
+		VALUES (:director_id, :title, :ganre, :rate, :release_date, :duration) RETURNING id;`
 
-	_, err := d.db.NamedExec(query, &movie)
+	result, err := d.db.NamedExec(query, &movie)
 	if err != nil {
 		pqError := new(pq.Error)
 		if errors.As(err, &pqError) && pqError.Code.Name() == ErrCodeForeignKeyViolation {
@@ -34,6 +36,14 @@ func (d MovieDB) InsertMovie(movie core.Movie) error {
 		}
 
 		return fmt.Errorf("error in NamedEx: %w", err)
+	}
+	effectedRows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("error in RowsAffected: %w", err)
+	}
+
+	if effectedRows != expectedEffectedRow {
+		return core.ErrNowMovieAdded
 	}
 
 	return nil

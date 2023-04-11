@@ -14,10 +14,11 @@ func NewMovieService(storage MovieStorage) MovieService {
 	return MovieService{movieStorage: storage}
 }
 
-func (m MovieService) CreateMovie(movie core.Movie) (string, error) {
-	if err := m.movieStorage.InsertMovie(movie); err != nil {
-		return "", fmt.Errorf("error happens while inserting movie: %w", err)
+func (m MovieService) CreateMovie(movie core.Movie) error {
+	err := m.movieStorage.InsertMovie(movie)
+	if err != nil {
+		return fmt.Errorf("error happens while inserting movie: %w", err)
 	}
 
-	return "", nil
+	return nil
 }

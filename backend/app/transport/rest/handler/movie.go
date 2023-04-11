@@ -41,8 +41,7 @@ func (h *MovieHandler) create(c *gin.Context) {
 		return
 	}
 
-	_, err = h.service.CreateMovie(movie)
-	if err != nil {
+	if err := h.service.CreateMovie(movie); err != nil {
 		if errors.Is(err, core.ErrForeignViolation) {
 			h.logger.Debugw("CreateMovie", "error", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -63,8 +62,7 @@ func (h *MovieHandler) create(c *gin.Context) {
 		return
 	}
 
-	// c.JSON(http.StatusCreated, gin.H{"action": "successful"})
-	c.JSON(http.StatusCreated, movie)
+	c.JSON(http.StatusCreated, gin.H{"action": "successful"})
 }
 
 func (h *MovieHandler) get(c *gin.Context) {

@@ -19,7 +19,7 @@ type DirectorService interface {
 }
 
 type MovieService interface {
-	CreateMovie(movie core.Movie) (string, error)
+	CreateMovie(movie core.Movie) error
 }
 
 type ListsService interface {
