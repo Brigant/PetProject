@@ -9,6 +9,24 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+var (
+	availableRoles                  = []string{"user", "admin"}
+	errValidatorBind                = errors.New("can't bind the validator")
+	checkRoleFunc    validator.Func = func(fl validator.FieldLevel) bool {
+		role, ok := fl.Field().Interface().(string)
+		if ok {
+			for _, r := range availableRoles {
+				if r == role {
+					return true
+				}
+			}
+		}
+
+		return false
+	}
+)
+
+// The structure describes the dependencies.
 type Deps struct {
 	AccountService  AccountService
 	DirectorService DirectorService
@@ -28,28 +46,11 @@ func NewHandler(deps Deps, logger *logger.Logger) Handler {
 	return Handler{
 		Account:  NewAccountHandler(deps.AccountService, logger),
 		Director: NewDirectorHandler(deps.DirectorService, logger),
-		Movie:    NewMovieHandler(deps.MovieService),
+		Movie:    NewMovieHandler(deps.MovieService, logger),
 		List:     NewListHandler(deps.ListsService),
 		log:      logger,
 	}
 }
-
-var (
-	availableRoles                  = []string{"user", "admin"}
-	errValidatorBind                = errors.New("can't bind the validator")
-	checkRoleFunc    validator.Func = func(fl validator.FieldLevel) bool {
-		role, ok := fl.Field().Interface().(string)
-		if ok {
-			for _, r := range availableRoles {
-				if r == role {
-					return true
-				}
-			}
-		}
-
-		return false
-	}
-)
 
 func (h *Handler) InitRouter(mode string) *gin.Engine {
 	if mode == "release" {

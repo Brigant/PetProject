@@ -23,7 +23,7 @@ type DirectorStorage interface {
 }
 
 type MovieStorage interface {
-	InsertMovie() error
+	InsertMovie(movie core.Movie) error
 	SelectAllMovies() error
 	SelectMovieByID() error
 }

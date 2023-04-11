@@ -199,18 +199,18 @@ func (m *MockMovieService) EXPECT() *MockMovieServiceMockRecorder {
 	return m.recorder
 }
 
-// GetMovie mocks base method.
-func (m *MockMovieService) GetMovie() error {
+// CreateMovie mocks base method.
+func (m *MockMovieService) CreateMovie(movie core.Movie) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMovie")
+	ret := m.ctrl.Call(m, "CreateMovie", movie)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// GetMovie indicates an expected call of GetMovie.
-func (mr *MockMovieServiceMockRecorder) GetMovie() *gomock.Call {
+// CreateMovie indicates an expected call of CreateMovie.
+func (mr *MockMovieServiceMockRecorder) CreateMovie(movie interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMovie", reflect.TypeOf((*MockMovieService)(nil).GetMovie))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMovie", reflect.TypeOf((*MockMovieService)(nil).CreateMovie), movie)
 }
 
 // MockListsService is a mock of ListsService interface.
@@ -236,16 +236,17 @@ func (m *MockListsService) EXPECT() *MockListsServiceMockRecorder {
 	return m.recorder
 }
 
-// GetList mocks base method.
-func (m *MockListsService) GetList() error {
+// CreateMovie mocks base method.
+func (m *MockListsService) CreateMovie() (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetList")
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "CreateMovie")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// GetList indicates an expected call of GetList.
-func (mr *MockListsServiceMockRecorder) GetList() *gomock.Call {
+// CreateMovie indicates an expected call of CreateMovie.
+func (mr *MockListsServiceMockRecorder) CreateMovie() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetList", reflect.TypeOf((*MockListsService)(nil).GetList))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMovie", reflect.TypeOf((*MockListsService)(nil).CreateMovie))
 }

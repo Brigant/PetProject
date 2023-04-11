@@ -228,17 +228,17 @@ func (m *MockMovieStorage) EXPECT() *MockMovieStorageMockRecorder {
 }
 
 // InsertMovie mocks base method.
-func (m *MockMovieStorage) InsertMovie() error {
+func (m *MockMovieStorage) InsertMovie(movie core.Movie) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InsertMovie")
+	ret := m.ctrl.Call(m, "InsertMovie", movie)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InsertMovie indicates an expected call of InsertMovie.
-func (mr *MockMovieStorageMockRecorder) InsertMovie() *gomock.Call {
+func (mr *MockMovieStorageMockRecorder) InsertMovie(movie interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertMovie", reflect.TypeOf((*MockMovieStorage)(nil).InsertMovie))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertMovie", reflect.TypeOf((*MockMovieStorage)(nil).InsertMovie), movie)
 }
 
 // SelectAllMovies mocks base method.

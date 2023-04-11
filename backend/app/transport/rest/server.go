@@ -9,7 +9,7 @@ import (
 	"github.com/Brigant/PetPorject/backend/app/transport/rest/handler"
 	"github.com/Brigant/PetPorject/backend/config"
 	"github.com/Brigant/PetPorject/backend/logger"
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // the blank import is needed beceause of sqlx requirements
 )
 
 type Server struct {
@@ -51,12 +51,14 @@ func SetupAndRun() error {
 		service.Deps{
 			AccountStorage:  storage.AccountDB,
 			DirectorStorage: storage.DirectorDB,
+			MovieStorage:    storage.MovieDB,
 		})
 
 	restHandlers := handler.NewHandler(
 		handler.Deps{
 			DirectorService: services.Director,
 			AccountService:  services.Account,
+			MovieService:    services.Movie,
 		}, logger)
 
 	routes := restHandlers.InitRouter(cfg.Server.Mode)

@@ -8,6 +8,12 @@ import (
 	_ "github.com/lib/pq" // nececarry blank import
 )
 
+const (
+	ErrCodeUniqueViolation     = "unique_violation"
+	ErrCodeNoData              = "no_data"
+	ErrCodeForeignKeyViolation = "foreign_key_violation"
+)
+
 type Repository struct {
 	AccountDB  AccountDB
 	DirectorDB DirectorDB
@@ -21,7 +27,7 @@ func NewPostgresDB(cfg config.Config) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot connect to db: %w", err)
 	}
-	
+
 	return database, nil
 }
 

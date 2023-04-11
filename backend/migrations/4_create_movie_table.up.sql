@@ -10,6 +10,7 @@ CREATE TABLE "movie" (
    "modified" Timestamp With Time Zone NOT NULL DEFAULT NOW(),
    PRIMARY KEY ("id"),
    CONSTRAINT "unique_movie_id" UNIQUE("id"),
+   CONSTRAINT "unique_movie_title_director_id" UNIQUE("title", "director_id"),
    CONSTRAINT "diretor_fk" FOREIGN KEY (director_id) REFERENCES public."director"(id)
 );
 

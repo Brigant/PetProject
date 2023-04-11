@@ -1,12 +1,11 @@
 package pg
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/Brigant/PetPorject/backend/app/core"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // the blank import is needed beceause of sqlx requirements
 )
 
 type DirectorDB struct {
@@ -19,6 +18,8 @@ func NewDirectorDB(db *sqlx.DB) DirectorDB {
 
 // The method inserts the director to the DB.
 func (d DirectorDB) InsertDirector(director core.Director) error {
+	const expectedEffectedRow = 1
+
 	query := `INSERT INTO public.director(name, birth_date)
 		VALUES($1, $2)`
 
@@ -32,8 +33,8 @@ func (d DirectorDB) InsertDirector(director core.Director) error {
 		return fmt.Errorf("err happaned while getin RowsAffected: %w", err)
 	}
 
-	if affectedRow != 1 {
-		return errors.New("wrong number of affected rows , should be 1")
+	if affectedRow != expectedEffectedRow {
+		return core.ErrNowDirectorAdded
 	}
 
 	return nil
@@ -63,8 +64,17 @@ func (d DirectorDB) SelectDirectorList() ([]core.Director, error) {
 
 	var directorsList []core.Director
 
-	rows, _ := d.db.DB.Query(query)
+	rows, err := d.db.DB.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("error while Query: %w", err)
+	}
+
 	defer rows.Close()
+
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("rows.Err(): %w", err)
+	}
+
 	for rows.Next() {
 		var director core.Director
 		if err := rows.Scan(
@@ -73,7 +83,7 @@ func (d DirectorDB) SelectDirectorList() ([]core.Director, error) {
 			&director.BirthDate.Time,
 			&director.Created,
 			&director.Modified); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error while scan director list: %w", err)
 		}
 
 		directorsList = append(directorsList, director)
