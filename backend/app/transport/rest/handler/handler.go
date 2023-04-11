@@ -2,7 +2,7 @@ package handler
 
 import (
 	"errors"
-	
+
 	"github.com/Brigant/PetPorject/backend/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -51,7 +51,6 @@ func NewHandler(deps Deps, logger *logger.Logger) Handler {
 		log:      logger,
 	}
 }
-
 
 func (h *Handler) InitRouter(mode string) *gin.Engine {
 	if mode == "release" {

@@ -34,6 +34,7 @@ func (h *DirectorHandler) create(c *gin.Context) {
 
 	if err := h.service.CreateDirector(director); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
 		return
 	}
 
@@ -59,7 +60,7 @@ func (h *DirectorHandler) get(c *gin.Context) {
 		return
 	}
 
-	director, err := h.service.GetDirectorWithID(string(id))
+	director, err := h.service.GetDirectorWithID(id)
 	if err != nil {
 		h.logger.Errorw("GetDirectorWithID", "error", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

@@ -19,23 +19,28 @@ type Director struct {
 	Modified  string       `json:"modified"  db:"modified"`
 }
 
-var ErrDublicatDirector = errors.New("there is the director with such data")
+var (
+	ErrDublicatDirector = errors.New("there is the director with such data")
+	ErrNowDirectorAdded = errors.New("no director added")
+)
 
 // Custom unmarshal function, for the custom type BrithDayType,
 // which should format the time.Time field to "2006-01-02" patern.
 func (b *BirthDayType) UnmarshalJSON(data []byte) error {
 	var rawDate string
+
 	err := json.Unmarshal(data, &rawDate)
 	if err != nil {
-		return err
+		return fmt.Errorf("custom unmarshal error: %w", err)
 	}
 
 	parsedDate, err := time.Parse("2006-01-02", rawDate)
 	if err != nil {
-		return err
+		return fmt.Errorf("date parsing error: %w", err)
 	}
 
 	*b = BirthDayType{parsedDate}
+
 	return nil
 }
 

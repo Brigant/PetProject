@@ -37,6 +37,7 @@ func (d MovieDB) InsertMovie(movie core.Movie) error {
 
 		return fmt.Errorf("error in NamedEx: %w", err)
 	}
+
 	effectedRows, err := result.RowsAffected()
 	if err != nil {
 		return fmt.Errorf("error in RowsAffected: %w", err)

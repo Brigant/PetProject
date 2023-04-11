@@ -9,7 +9,7 @@ import (
 	"github.com/Brigant/PetPorject/backend/app/transport/rest/handler"
 	"github.com/Brigant/PetPorject/backend/config"
 	"github.com/Brigant/PetPorject/backend/logger"
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // the blank import is needed beceause of sqlx requirements
 )
 
 type Server struct {
