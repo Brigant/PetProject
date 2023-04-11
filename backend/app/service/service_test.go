@@ -33,8 +33,4 @@ func TestNew(t *testing.T) {
 
 		assert.NotEmpty(t, fieldVal, "All stucture field should be not nil")
 	}
-
-	// for i := 0; i < sValue.NumField(); i++ {
-	// 	assert.NotEmpty(t, )
-	// }
 }
