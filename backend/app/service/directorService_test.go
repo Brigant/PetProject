@@ -43,7 +43,7 @@ func TestGreateDirector(t *testing.T) {
 					errors.New("some storage error"),
 				)
 			},
-			expectedErrorMessage: "some storage error",
+			expectedErrorMessage: "service get an error while InserDirector: some storage error",
 			wantError:            true,
 		},
 	}
@@ -61,7 +61,7 @@ func TestGreateDirector(t *testing.T) {
 				storage: DirectorStorage,
 			}
 
-			err := ds.storage.InsertDirector(testCase.director)
+			err := ds.CreateDirector(testCase.director)
 
 			if testCase.wantError {
 				assert.EqualError(t, err, testCase.expectedErrorMessage,
@@ -104,7 +104,7 @@ func TestGetDirectorWithID(t *testing.T) {
 					errors.New("some error"))
 			},
 			expectedDirector:     core.Director{},
-			expectedErrorMessage: "some error",
+			expectedErrorMessage: "selectDirectorByID returne error: some error",
 			wantError:            true,
 		},
 	}
@@ -122,7 +122,7 @@ func TestGetDirectorWithID(t *testing.T) {
 				storage: DirectorStorage,
 			}
 
-			actualDirector, err := ds.storage.SelectDirectorByID(testCase.directorID)
+			actualDirector, err := ds.GetDirectorWithID(testCase.directorID)
 			if testCase.wantError {
 				assert.Equal(t, testCase.expectedDirector, actualDirector, "The entety of director should has empty fields")
 				assert.EqualError(t, err, testCase.expectedErrorMessage,
@@ -163,7 +163,7 @@ func TestGetDirectorList(t *testing.T) {
 					errors.New("some error"))
 			},
 			expectedList:         nil,
-			expectedErrorMessage: "some error",
+			expectedErrorMessage: "SelectDirectorList returned the error: some error",
 			wantError:            true,
 		},
 	}
@@ -181,13 +181,13 @@ func TestGetDirectorList(t *testing.T) {
 				storage: DirectorStorage,
 			}
 
-			actualDirector, err := ds.storage.SelectDirectorList()
+			actualList, err := ds.GetDirectorList()
 			if testCase.wantError {
-				assert.Equal(t, testCase.expectedList, actualDirector, "The director list should be nil")
+				assert.Equal(t, testCase.expectedList, actualList, "The director list should be nil")
 				assert.EqualError(t, err, testCase.expectedErrorMessage,
 					"We want get an error beceause the storage returned the error")
 			} else {
-				assert.Equal(t, testCase.expectedList, actualDirector)
+				assert.Equal(t, testCase.expectedList, actualList)
 				assert.NoError(t, err, "The error should be nil")
 			}
 		})

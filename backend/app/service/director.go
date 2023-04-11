@@ -27,7 +27,7 @@ func (d DirectorService) CreateDirector(director core.Director) error {
 func (d DirectorService) GetDirectorWithID(directorID string) (core.Director, error) {
 	director, err := d.storage.SelectDirectorByID(directorID)
 	if err != nil {
-		return core.Director{}, fmt.Errorf("SelectDirectorByID returne error: %w", err)
+		return core.Director{}, fmt.Errorf("selectDirectorByID returne error: %w", err)
 	}
 
 	return director, nil

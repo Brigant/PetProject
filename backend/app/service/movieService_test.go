@@ -21,17 +21,19 @@ func TestMovieService_create(t *testing.T) {
 		"Successful": {
 			movie: core.Movie{},
 			mockBehavior: func(s *MockMovieStorage, movie core.Movie) {
-				s.EXPECT().InsertMovie(movie).Return(nil)
+				s.EXPECT().InsertMovie(movie).Return(nil).Times(1)
 			},
 			expectedErrorMessage: "",
 			wantError:            false,
 		},
 		"Wants error": {
-			movie: core.Movie{},
-			mockBehavior: func(s *MockMovieStorage, movie core.Movie) {
-				s.EXPECT().InsertMovie(movie).Return(errors.New("some error"))
+			movie: core.Movie{
+				Title: "Some title",
 			},
-			expectedErrorMessage: "some error",
+			mockBehavior: func(s *MockMovieStorage, movie core.Movie) {
+				s.EXPECT().InsertMovie(movie).Return(errors.New("some error")).Times(1)
+			},
+			expectedErrorMessage: "error happens while inserting movie: some error",
 			wantError:            true,
 		},
 	}
@@ -49,7 +51,7 @@ func TestMovieService_create(t *testing.T) {
 				movieStorage: mStorage,
 			}
 
-			err := ms.movieStorage.InsertMovie(testCase.movie)
+			err := ms.CreateMovie(testCase.movie)
 
 			if testCase.wantError {
 				assert.EqualError(t, err, testCase.expectedErrorMessage,
