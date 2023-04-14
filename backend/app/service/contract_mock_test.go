@@ -256,15 +256,16 @@ func (mr *MockMovieStorageMockRecorder) SelectAllMovies() *gomock.Call {
 }
 
 // SelectMovieByID mocks base method.
-func (m *MockMovieStorage) SelectMovieByID() error {
+func (m *MockMovieStorage) SelectMovieByID(movieID string) (core.Movie, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectMovieByID")
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "SelectMovieByID", movieID)
+	ret0, _ := ret[0].(core.Movie)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SelectMovieByID indicates an expected call of SelectMovieByID.
-func (mr *MockMovieStorageMockRecorder) SelectMovieByID() *gomock.Call {
+func (mr *MockMovieStorageMockRecorder) SelectMovieByID(movieID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectMovieByID", reflect.TypeOf((*MockMovieStorage)(nil).SelectMovieByID))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectMovieByID", reflect.TypeOf((*MockMovieStorage)(nil).SelectMovieByID), movieID)
 }

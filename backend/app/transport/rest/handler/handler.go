@@ -85,14 +85,14 @@ func (h *Handler) InitRouter(mode string) *gin.Engine {
 	movie := router.Group("/movie", h.userIdentity)
 	{
 		movie.POST("/", h.adminIdentity, h.Movie.create)
-		movie.GET("/{id}", h.Movie.get)
+		movie.GET("/:id", h.Movie.get)
 		movie.GET("/", h.Movie.getAll)
 	}
 
 	list := router.Group("list", h.userIdentity)
 	{
 		list.POST("/", h.List.create)
-		list.GET("/{id}", h.List.get)
+		list.GET("/:id", h.List.get)
 		list.GET("/", h.List.getAll)
 	}
 

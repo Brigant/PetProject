@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/Brigant/PetPorject/backend/app/core"
@@ -46,7 +47,7 @@ func (h *DirectorHandler) create(c *gin.Context) {
 func (h *DirectorHandler) get(c *gin.Context) {
 	id, ok := c.Params.Get("id")
 	if !ok {
-		h.logger.Debugw("No direcrotId param in path")
+		h.logger.Debugw("No direcrotId in the path")
 		c.JSON(http.StatusBadRequest, gin.H{"erro": "No direcrotId param in path"})
 
 		return
@@ -54,7 +55,7 @@ func (h *DirectorHandler) get(c *gin.Context) {
 
 	_, err := uuid.Parse(id)
 	if err != nil {
-		h.logger.Debugw("id si not UUID", "error", err.Error())
+		h.logger.Debugw("ID is not UUID", "error", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
 		return
@@ -62,6 +63,13 @@ func (h *DirectorHandler) get(c *gin.Context) {
 
 	director, err := h.service.GetDirectorWithID(id)
 	if err != nil {
+		if errors.Is(err, core.ErrNowDirectorFound) {
+			h.logger.Debugw("Get director", "error", err.Error())
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+			return
+		}
+
 		h.logger.Errorw("GetDirectorWithID", "error", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 

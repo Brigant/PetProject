@@ -14,6 +14,7 @@ func NewMovieService(storage MovieStorage) MovieService {
 	return MovieService{movieStorage: storage}
 }
 
+// Add the movie to the storage.
 func (m MovieService) CreateMovie(movie core.Movie) error {
 	err := m.movieStorage.InsertMovie(movie)
 	if err != nil {
@@ -21,4 +22,14 @@ func (m MovieService) CreateMovie(movie core.Movie) error {
 	}
 
 	return nil
+}
+
+// The simple get the movie from the storage.
+func (m MovieService) Get(movieID string) (core.Movie, error) {
+	movie, err := m.movieStorage.SelectMovieByID(movieID)
+	if err != nil {
+		return core.Movie{}, fmt.Errorf("service Get got the error: %w", err)
+	}
+
+	return movie, nil
 }

@@ -65,10 +65,43 @@ func (h *MovieHandler) create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"action": "successful"})
 }
 
+// Handler for the movie recieving.
 func (h *MovieHandler) get(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"get": "res"})
+	id, ok := c.Params.Get("id")
+	if !ok {
+		h.logger.Debugw("No movieID in the path")
+		c.JSON(http.StatusBadRequest, gin.H{"erro": "No direcrotId param in path"})
+
+		return
+	}
+
+	_, err := uuid.Parse(id)
+	if err != nil {
+		h.logger.Debugw("ID is not UUID", "error", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	movie, err := h.service.Get(id)
+	if err!=nil {
+		if errors.Is(err, core.ErrMovieNotFound) {
+			h.logger.Debugw("Get movie", "error", err.Error())
+			c.JSON(http.StatusNotFound, gin.H{"error":err.Error()})
+
+			return
+		}
+
+		h.logger.Errorw("Get movie", "error", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error":err.Error()})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, movie)
 }
 
+// Handeler for the movie's list recievcing weighted by parameters.
 func (h *MovieHandler) getAll(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"getAll": "res"})
 }

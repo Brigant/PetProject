@@ -1,6 +1,7 @@
 package pg
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -17,6 +18,7 @@ func NewMovieDB(db *sqlx.DB) MovieDB {
 	return MovieDB{db: db}
 }
 
+// Insert structure movie to database.
 func (d MovieDB) InsertMovie(movie core.Movie) error {
 	const expectedEffectedRow = 1
 
@@ -40,11 +42,11 @@ func (d MovieDB) InsertMovie(movie core.Movie) error {
 
 	effectedRows, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("error in RowsAffected: %w", err)
+		return fmt.Errorf("the error is in RowsAffected: %w", err)
 	}
 
 	if effectedRows != expectedEffectedRow {
-		return core.ErrNowMovieAdded
+		return core.ErrNowMovieAdd
 	}
 
 	return nil
@@ -54,6 +56,19 @@ func (d MovieDB) SelectAllMovies() error {
 	return nil
 }
 
-func (d MovieDB) SelectMovieByID() error {
-	return nil
+// Select and return the movie entities via movie ID
+func (d MovieDB) SelectMovieByID(movieID string) (core.Movie, error) {
+	query := `SELECT id, director_id, title, ganre, rate, release_date, duration, created, modified
+	FROM public.movie WHERE id=$1`
+
+	var movie core.Movie
+	if err := d.db.Get(&movie, query, movieID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return core.Movie{}, core.ErrMovieNotFound
+		}
+
+		return core.Movie{}, fmt.Errorf("an error occurs while getting the movie: %w", err)
+	}
+
+	return movie, nil
 }
