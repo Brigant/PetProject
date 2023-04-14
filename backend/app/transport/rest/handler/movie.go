@@ -65,7 +65,7 @@ func (h *MovieHandler) create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"action": "successful"})
 }
 
-// Handler for the movie recieving.
+// Handler for the movie receiving.
 func (h *MovieHandler) get(c *gin.Context) {
 	id, ok := c.Params.Get("id")
 	if !ok {
