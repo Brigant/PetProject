@@ -70,7 +70,7 @@ func (h *MovieHandler) get(c *gin.Context) {
 	id, ok := c.Params.Get("id")
 	if !ok {
 		h.logger.Debugw("No movieID in the path")
-		c.JSON(http.StatusBadRequest, gin.H{"erro": "No direcrotId param in path"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No movieID param in path"})
 
 		return
 	}
@@ -84,16 +84,16 @@ func (h *MovieHandler) get(c *gin.Context) {
 	}
 
 	movie, err := h.service.Get(id)
-	if err!=nil {
+	if err != nil {
 		if errors.Is(err, core.ErrMovieNotFound) {
 			h.logger.Debugw("Get movie", "error", err.Error())
-			c.JSON(http.StatusNotFound, gin.H{"error":err.Error()})
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
 			return
 		}
 
 		h.logger.Errorw("Get movie", "error", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error":err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 
 		return
 	}
