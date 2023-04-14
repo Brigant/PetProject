@@ -56,7 +56,7 @@ func (d DirectorDB) SelectDirectorByID(directorID string) (core.Director, error)
 		if errors.Is(err, sql.ErrNoRows) {
 			return core.Director{}, core.ErrNowDirectorFound
 		}
-		
+
 		return core.Director{}, fmt.Errorf("errow while Select director: %w", err)
 	}
 

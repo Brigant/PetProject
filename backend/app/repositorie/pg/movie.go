@@ -56,7 +56,7 @@ func (d MovieDB) SelectAllMovies() error {
 	return nil
 }
 
-// Select and return the movie entities via movie ID
+// Select and return the movie entities via movie ID.
 func (d MovieDB) SelectMovieByID(movieID string) (core.Movie, error) {
 	query := `SELECT id, director_id, title, ganre, rate, release_date, duration, created, modified
 	FROM public.movie WHERE id=$1`
