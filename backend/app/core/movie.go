@@ -17,5 +17,6 @@ type Movie struct {
 var (
 	ErrForeignViolation = errors.New("wrong foreign key")
 	ErrUniqueMovie      = errors.New("dublicating the movie title with the such director")
-	ErrNowMovieAdded    = errors.New("no movie added")
+	ErrNowMovieAdd      = errors.New("no movie added")
+	ErrMovieNotFound    = errors.New("no movie with such ID")
 )

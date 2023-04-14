@@ -22,6 +22,7 @@ type Director struct {
 var (
 	ErrDublicatDirector = errors.New("there is the director with such data")
 	ErrNowDirectorAdded = errors.New("no director added")
+	ErrNowDirectorFound = errors.New("no director found")
 )
 
 // Custom unmarshal function, for the custom type BrithDayType,
