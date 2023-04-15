@@ -125,7 +125,14 @@ func (h *MovieHandler) getAll(c *gin.Context) {
 
 	movieList, err := h.service.GetList(qp)
 	if err != nil {
-		h.logger.Debugw("bad query", "error", err.Error())
+		if errors.Is(err, core.ErrMovieNotFound) {
+			h.logger.Debugw("bad query", "alert", err.Error())
+			c.JSON(http.StatusOK, gin.H{"alert": err.Error()})
+
+			return
+		}
+
+		h.logger.Debugw("Service Getlist", "error", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 
 		return

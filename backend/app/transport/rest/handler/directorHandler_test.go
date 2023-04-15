@@ -60,7 +60,7 @@ func TestDirector_create(t *testing.T) {
 			mockBehavior: func(s *MockDirectorService, director core.Director) {
 			},
 			expectedStatusCode:  http.StatusBadRequest,
-			expectedRequestBody: `{"error":"parsing time \"20222-12-30\" as \"2006-01-02\": cannot parse \"2-12-30\" as \"-\""}`,
+			expectedRequestBody: `{"error":"date parsing error: parsing time \"20222-12-30\" as \"2006-01-02\": cannot parse \"2-12-30\" as \"-\""}`,
 		},
 		"service return error": {
 			logger:    log,
@@ -211,7 +211,7 @@ func TestDirector_get(t *testing.T) {
 		"Internal error": {
 			logger: log,
 			mockBehavior: func(s *MockDirectorService) {
-				s.EXPECT().GetDirectorList().Return([]core.Director{}, 
+				s.EXPECT().GetDirectorList().Return([]core.Director{},
 					errors.New("some internal error"))
 			},
 			expectedStatusCode:  http.StatusInternalServerError,

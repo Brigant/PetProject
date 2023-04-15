@@ -26,8 +26,9 @@ var (
 	ErrForeignViolation     = errors.New("wrong foreign key")
 	ErrUniqueMovie          = errors.New("dublicating the movie title with the such director")
 	ErrNowMovieAdd          = errors.New("no movie added")
-	ErrMovieNotFound        = errors.New("no movie with such ID")
+	ErrMovieNotFound        = errors.New("no movie was found")
 	ErrUnallowedExportValue = errors.New("unallowed export value")
+	ErrUnallowedRateValue   = errors.New("unallowed rate value")
 )
 
 // QueryParams represent request query params
@@ -56,10 +57,13 @@ func (qp QueryParams) Validate() error {
 	var (
 		minOffset          = 0
 		maxOffset          = 1000
+		minRate            = 0
+		maxRate            = 10
 		allowedLimitVal    = []string{"20", "50", "100"}
-		AllowedFilterKey   = []string{"genre", "rate"}
-		AllowedSortKey     = []string{"rate", "release_date", "duration"}
-		AllowedExportValue = []string{"csv", ""}
+		allowedFilterKey   = []string{"genre", "rate"}
+		allowedSortKey     = []string{"rate", "release_date", "duration"}
+		allowedSortValue   = []string{"asc", "dsc"}
+		allowedExportValue = []string{"csv", ""}
 	)
 
 	if notInSlice(qp.Limit, allowedLimitVal) {
@@ -76,22 +80,34 @@ func (qp QueryParams) Validate() error {
 	}
 
 	for key, val := range qp.Filter {
-		_ = val
-		if notInSlice(key, AllowedFilterKey) {
+		if notInSlice(key, allowedFilterKey) {
 			return ErrUnallowedFilterKey
 		}
 
+		if key == "rate" {
+			i, err := strconv.Atoi(val)
+			if err != nil {
+				return fmt.Errorf("the value shlould be an integer: %w", err)
+			}
+
+			if i < minRate || i > maxRate {
+				return fmt.Errorf("the value should be in range from 1 to 10 :%w", ErrUnallowedRateValue)
+			}
+		}
 	}
 
 	for key, val := range qp.Sort {
-		_ = val
-		if notInSlice(key, AllowedSortKey[:]) {
+		if notInSlice(key, allowedSortKey) {
 			return fmt.Errorf("key %v is bad: %w", key, ErrUnallowedSort)
+		}
+
+		if notInSlice(val, allowedSortValue) {
+			return fmt.Errorf("the sort value: %w", ErrUnallowedSort)
 		}
 
 	}
 
-	if notInSlice(qp.Export, AllowedExportValue) {
+	if notInSlice(qp.Export, allowedExportValue) {
 		return fmt.Errorf("value %v: %w", qp.Export, ErrUnallowedExportValue)
 	}
 
