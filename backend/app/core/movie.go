@@ -40,7 +40,7 @@ type QueryParams struct {
 	Export string            `json:"export"`
 }
 
-//  Set the default values to the Limit and Offset fields.
+// Set the default values to the Limit and Offset fields.
 func (qp *QueryParams) SetDefaultValues() {
 	if qp.Limit == "" {
 		qp.Limit = "20"
@@ -56,19 +56,13 @@ func (qp QueryParams) Validate() error {
 	var (
 		minOffset          = 0
 		maxOffset          = 1000
-		minLimit           = 1
-		maxLimit           = 1000
+		allowedLimitVal    = []string{"20", "50", "100"}
 		AllowedFilterKey   = []string{"genre", "rate"}
 		AllowedSortKey     = []string{"rate", "release_date", "duration"}
 		AllowedExportValue = []string{"csv", ""}
 	)
 
-	limit, err := strconv.Atoi(qp.Limit)
-	if err != nil {
-		return fmt.Errorf("limit has to be an integer: %w", err)
-	}
-
-	if limit < minLimit || limit > maxLimit {
+	if notInSlice(qp.Limit, allowedLimitVal) {
 		return ErrUnallowedLimit
 	}
 
