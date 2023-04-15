@@ -1,11 +1,15 @@
 package core
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"strconv"
+)
 
 type Movie struct {
 	ID          string `json:"id" db:"id"`
 	Title       string `json:"title" binding:"required,min=1" db:"title"`
-	Ganre       string `json:"ganre" binding:"required" db:"ganre"`
+	Genre       string `json:"genre" binding:"required" db:"genre"`
 	DirectorID  string `json:"director_id" binding:"required" db:"director_id"`
 	Rate        int    `json:"rate" binding:"gte=0,lte=10" db:"rate"`
 	ReleaseDate string `json:"release_date" binding:"required" db:"release_date"`
@@ -15,8 +19,97 @@ type Movie struct {
 }
 
 var (
-	ErrForeignViolation = errors.New("wrong foreign key")
-	ErrUniqueMovie      = errors.New("dublicating the movie title with the such director")
-	ErrNowMovieAdd      = errors.New("no movie added")
-	ErrMovieNotFound    = errors.New("no movie with such ID")
+	ErrUnallowedOffset      = errors.New("unallowed offset")
+	ErrUnallowedFilterKey   = errors.New("unallowed filter key")
+	ErrUnallowedSort        = errors.New("unallowed sort")
+	ErrUnallowedLimit       = errors.New("unallowed limit")
+	ErrForeignViolation     = errors.New("wrong foreign key")
+	ErrUniqueMovie          = errors.New("dublicating the movie title with the such director")
+	ErrNowMovieAdd          = errors.New("no movie added")
+	ErrMovieNotFound        = errors.New("no movie with such ID")
+	ErrUnallowedExportValue = errors.New("unallowed export value")
 )
+
+// QueryParams represent request query params
+// that will be used on transport and repository level.
+type QueryParams struct {
+	Limit  string            `json:"limit"`
+	Offset string            `json:"offset"`
+	Filter map[string]string `json:"filter"`
+	Sort   map[string]string `json:"sort"`
+	Export string            `json:"export"`
+}
+
+//  Set the default values to the Limit and Offset fields.
+func (qp *QueryParams) SetDefaultValues() {
+	if qp.Limit == "" {
+		qp.Limit = "20"
+	}
+
+	if qp.Offset == "" {
+		qp.Offset = "0"
+	}
+}
+
+// Validate all fields of the query parameters.
+func (qp QueryParams) Validate() error {
+	var (
+		minOffset          = 0
+		maxOffset          = 1000
+		minLimit           = 1
+		maxLimit           = 1000
+		AllowedFilterKey   = []string{"genre", "rate"}
+		AllowedSortKey     = []string{"rate", "release_date", "duration"}
+		AllowedExportValue = []string{"csv", ""}
+	)
+
+	limit, err := strconv.Atoi(qp.Limit)
+	if err != nil {
+		return fmt.Errorf("limit has to be an integer: %w", err)
+	}
+
+	if limit < minLimit || limit > maxLimit {
+		return ErrUnallowedLimit
+	}
+
+	offset, err := strconv.Atoi(qp.Offset)
+	if err != nil {
+		return fmt.Errorf("offset has to be an integer: %w", err)
+	}
+
+	if offset < minOffset || offset > maxOffset {
+		return fmt.Errorf("offset should be in range from %v to %v: %w", minOffset, maxOffset, ErrUnallowedOffset)
+	}
+
+	for key, val := range qp.Filter {
+		_ = val
+		if notInSlice(key, AllowedFilterKey) {
+			return ErrUnallowedFilterKey
+		}
+
+	}
+
+	for key, val := range qp.Sort {
+		_ = val
+		if notInSlice(key, AllowedSortKey[:]) {
+			return fmt.Errorf("key %v is bad: %w", key, ErrUnallowedSort)
+		}
+
+	}
+
+	if notInSlice(qp.Export, AllowedExportValue) {
+		return fmt.Errorf("value %v: %w", qp.Export, ErrUnallowedExportValue)
+	}
+
+	return nil
+}
+
+func notInSlice(element string, slice []string) bool {
+	for _, s := range slice {
+		if s == element {
+			return false
+		}
+	}
+
+	return true
+}

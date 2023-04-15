@@ -228,6 +228,21 @@ func (mr *MockMovieServiceMockRecorder) Get(movieID interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockMovieService)(nil).Get), movieID)
 }
 
+// GetList mocks base method.
+func (m *MockMovieService) GetList(arg0 core.QueryParams) ([]core.Movie, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetList", arg0)
+	ret0, _ := ret[0].([]core.Movie)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetList indicates an expected call of GetList.
+func (mr *MockMovieServiceMockRecorder) GetList(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetList", reflect.TypeOf((*MockMovieService)(nil).GetList), arg0)
+}
+
 // MockListsService is a mock of ListsService interface.
 type MockListsService struct {
 	ctrl     *gomock.Controller

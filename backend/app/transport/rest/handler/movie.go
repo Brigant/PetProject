@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/Brigant/PetPorject/backend/app/core"
@@ -101,7 +102,36 @@ func (h *MovieHandler) get(c *gin.Context) {
 	c.JSON(http.StatusOK, movie)
 }
 
-// Handeler for the movie's list recievcing weighted by parameters.
+// Handler is for the movie's list recievcing weighted by parameters. The full example of url query:
+// /?offset=3&filter[genre]=adventure&filter[rate]=10&s[duration]=desc&s[rate]=asc&s[release_date]=asc&limit=100&export=csv
+// The allowed values for s[...] are "desc" or "asc".
 func (h *MovieHandler) getAll(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"getAll": "res"})
+	var qp core.QueryParams
+
+	qp.Limit = c.Query("limit")
+	qp.Offset = c.Query("offset")
+	qp.Filter = c.QueryMap("f")
+	qp.Sort = c.QueryMap("s")
+	qp.Export = c.Query("export")
+
+	qp.SetDefaultValues()
+
+	if err := qp.Validate(); err != nil {
+		h.logger.Debugw("validation", "error", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	movieList, err := h.service.GetList(qp)
+	if err != nil {
+		h.logger.Debugw("bad query", "error", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	fmt.Printf("%+v\n\n", qp)
+
+	c.JSON(http.StatusOK, movieList)
 }

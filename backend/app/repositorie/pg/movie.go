@@ -52,10 +52,6 @@ func (d MovieDB) InsertMovie(movie core.Movie) error {
 	return nil
 }
 
-func (d MovieDB) SelectAllMovies() error {
-	return nil
-}
-
 // Select and return the movie entities via movie ID.
 func (d MovieDB) SelectMovieByID(movieID string) (core.Movie, error) {
 	query := `SELECT id, director_id, title, ganre, rate, release_date, duration, created, modified
@@ -71,4 +67,21 @@ func (d MovieDB) SelectMovieByID(movieID string) (core.Movie, error) {
 	}
 
 	return movie, nil
+}
+
+func (d MovieDB) SelectAllMovies(param string) ([]core.Movie, error) {
+	query := `SELECT id, director_id, title, genre, rate, release_date, duration, created, modified FROM public.movie `
+
+	query = query + param
+
+	var movieList []core.Movie
+	if err := d.db.Select(&movieList, query); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, core.ErrMovieNotFound
+		}
+
+		return nil, fmt.Errorf("an error occurs while getting the movie list: %w", err)
+	}
+
+	return movieList, nil
 }
