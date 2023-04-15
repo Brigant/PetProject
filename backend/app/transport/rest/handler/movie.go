@@ -2,8 +2,8 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Brigant/PetPorject/backend/app/core"
 	"github.com/Brigant/PetPorject/backend/logger"
@@ -103,16 +103,32 @@ func (h *MovieHandler) get(c *gin.Context) {
 }
 
 // Handler is for the movie's list recievcing weighted by parameters. The full example of url query:
-// /?offset=3&filter[genre]=adventure&filter[rate]=10&s[duration]=desc&s[rate]=asc&s[release_date]=asc&limit=100&export=csv
+// /movie/?offset=3&f=genre:comedy&f=rate:10&s=duration:desc&s=rate:asc&s=release_date:asc&limit=100&export=csv
 // The allowed values for s[...] are "desc" or "asc".
 func (h *MovieHandler) getAll(c *gin.Context) {
 	var qp core.QueryParams
 
 	qp.Limit = c.Query("limit")
 	qp.Offset = c.Query("offset")
-	qp.Filter = c.QueryMap("f")
-	qp.Sort = c.QueryMap("s")
 	qp.Export = c.Query("export")
+
+	for _, v := range c.QueryArray("f") {
+		keyval := strings.Split(v, ":")
+		var element core.QuerySliceElement
+		element.Key = keyval[0]
+		element.Val = keyval[1]
+
+		qp.Filter = append(qp.Filter, element)
+	}
+
+	for _, v := range c.QueryArray("s") {
+		keyval := strings.Split(v, ":")
+		var element core.QuerySliceElement
+		element.Key = keyval[0]
+		element.Val = keyval[1]
+
+		qp.Sort = append(qp.Sort, element)
+	}
 
 	qp.SetDefaultValues()
 
@@ -137,8 +153,6 @@ func (h *MovieHandler) getAll(c *gin.Context) {
 
 		return
 	}
-
-	fmt.Printf("%+v\n\n", qp)
 
 	c.JSON(http.StatusOK, movieList)
 }

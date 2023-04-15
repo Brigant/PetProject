@@ -39,46 +39,46 @@ func (m MovieService) Get(movieID string) (core.Movie, error) {
 // The general meaning of this service is to generate sql query parameter
 // and get the movie list from the database using that query parameter.
 func (m MovieService) GetList(qp core.QueryParams) ([]core.Movie, error) {
-	var queryParams string
+	var queryCondition string
 
 	if len(qp.Filter) > 0 {
 		where := "WHERE "
 
-		for field, value := range qp.Filter {
-			if value != "" {
-				if _, err := strconv.Atoi(value); err == nil {
-					where = where + field + ">" + value + " AND "
+		for i := 0; i < len(qp.Filter); i++ {
+			if qp.Filter[i].Val != "" {
+				if _, err := strconv.Atoi(qp.Filter[i].Val); err == nil {
+					where = where + qp.Filter[i].Key + ">=" + qp.Filter[i].Val + " AND "
 				} else {
-					where = where + field + "='" + value + "' AND "
+					where = where + qp.Filter[i].Key + "='" + qp.Filter[i].Val + "' AND "
 				}
 			}
 		}
 
 		where = strings.TrimSuffix(where, "AND ")
 
-		queryParams = queryParams + where
+		queryCondition = queryCondition + where
 	}
 
 	if len(qp.Sort) > 0 {
 		order := "ORDER BY "
 
-		for field, value := range qp.Sort {
-			if value != "" {
-				order = order + field + " " + value + ", "
+		for i := 0; i < len(qp.Sort); i++ {
+			if qp.Sort[i].Val != "" {
+				order = order + qp.Sort[i].Key + " " + qp.Sort[i].Val + ", "
 			}
 		}
 
 		order = strings.TrimSuffix(order, ", ")
 
-		queryParams = queryParams + order
+		queryCondition = queryCondition + order
 	}
 
-	queryParams = queryParams + " LIMIT " + qp.Limit
-	queryParams = queryParams + " OFFSET " + qp.Offset
+	queryCondition = queryCondition + " LIMIT " + qp.Limit
+	queryCondition = queryCondition + " OFFSET " + qp.Offset
 
-	movieList, err := m.movieStorage.SelectAllMovies(queryParams)
+	movieList, err := m.movieStorage.SelectAllMovies(queryCondition)
 	if err != nil {
-		return nil, fmt.Errorf("service Get got the error: %w", err)
+		return nil, fmt.Errorf("error while selecting movies: %w", err)
 	}
 
 	return movieList, nil

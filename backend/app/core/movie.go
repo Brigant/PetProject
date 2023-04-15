@@ -34,11 +34,16 @@ var (
 // QueryParams represent request query params
 // that will be used on transport and repository level.
 type QueryParams struct {
-	Limit  string            `json:"limit"`
-	Offset string            `json:"offset"`
-	Filter map[string]string `json:"filter"`
-	Sort   map[string]string `json:"sort"`
-	Export string            `json:"export"`
+	Limit  string              `json:"limit"`
+	Offset string              `json:"offset"`
+	Filter []QuerySliceElement `json:"filter"`
+	Sort   []QuerySliceElement `json:"sort"`
+	Export string              `json:"export"`
+}
+
+type QuerySliceElement struct {
+	Key string
+	Val string
 }
 
 // Set the default values to the Limit and Offset fields.
@@ -62,7 +67,7 @@ func (qp QueryParams) Validate() error {
 		allowedLimitVal    = []string{"20", "50", "100"}
 		allowedFilterKey   = []string{"genre", "rate"}
 		allowedSortKey     = []string{"rate", "release_date", "duration"}
-		allowedSortValue   = []string{"asc", "dsc"}
+		allowedSortValue   = []string{"asc", "desc"}
 		allowedExportValue = []string{"csv", ""}
 	)
 
@@ -79,13 +84,13 @@ func (qp QueryParams) Validate() error {
 		return fmt.Errorf("offset should be in range from %v to %v: %w", minOffset, maxOffset, ErrUnallowedOffset)
 	}
 
-	for key, val := range qp.Filter {
-		if notInSlice(key, allowedFilterKey) {
+	for _, elem := range qp.Filter {
+		if notInSlice(elem.Key, allowedFilterKey) {
 			return ErrUnallowedFilterKey
 		}
 
-		if key == "rate" {
-			i, err := strconv.Atoi(val)
+		if elem.Key == "rate" {
+			i, err := strconv.Atoi(elem.Val)
 			if err != nil {
 				return fmt.Errorf("the value shlould be an integer: %w", err)
 			}
@@ -96,15 +101,14 @@ func (qp QueryParams) Validate() error {
 		}
 	}
 
-	for key, val := range qp.Sort {
-		if notInSlice(key, allowedSortKey) {
-			return fmt.Errorf("key %v is bad: %w", key, ErrUnallowedSort)
+	for _, elem := range qp.Sort {
+		if notInSlice(elem.Key, allowedSortKey) {
+			return fmt.Errorf("key %v is bad: %w", elem.Key, ErrUnallowedSort)
 		}
 
-		if notInSlice(val, allowedSortValue) {
+		if notInSlice(elem.Val, allowedSortValue) {
 			return fmt.Errorf("the sort value: %w", ErrUnallowedSort)
 		}
-
 	}
 
 	if notInSlice(qp.Export, allowedExportValue) {
