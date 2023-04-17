@@ -2,7 +2,7 @@ CREATE TABLE "movie" (
    "id" uuid DEFAULT gen_random_uuid() NOT NULL,
    "director_id" uuid NOT NULL,
    "title" VARCHAR(255) NOT NULL,
-   "ganre" VARCHAR(255) NOT NULL,
+   "genre" VARCHAR(255) NOT NULL,
    "rate" INT NOT NULL,
    "release_date" Timestamp Without Time Zone NOT NULL,
    "duration" INT NOT NULL DEFAULT 0,

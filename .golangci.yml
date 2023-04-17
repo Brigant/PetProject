@@ -182,7 +182,7 @@ linters:
     - nilnil
     - nlreturn
     - noctx
-    - nolintlint
+    # - nolintlint
     #- nonamedreturns
     - nosprintfhostport
     - paralleltest
