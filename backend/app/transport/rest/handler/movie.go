@@ -8,6 +8,7 @@ import (
 	"github.com/Brigant/PetPorject/backend/app/core"
 	"github.com/Brigant/PetPorject/backend/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/gocarina/gocsv"
 	"github.com/google/uuid"
 )
 
@@ -104,7 +105,7 @@ func (h *MovieHandler) get(c *gin.Context) {
 
 // Handler is for the movie's list recievcing weighted by parameters. The full example of url query:
 // /movie/?offset=3&f=genre:comedy&f=rate:10&s=duration:desc&s=rate:asc&s=release_date:asc&limit=100&export=csv
-// The allowed values for s[...] are "desc" or "asc".
+// The allowed values for s[...] are "desc" or "asc", for export: "csv" or "none".
 func (h *MovieHandler) getAll(c *gin.Context) {
 	var qp core.QueryParams
 
@@ -113,6 +114,7 @@ func (h *MovieHandler) getAll(c *gin.Context) {
 	qp.Export = c.Query("export")
 
 	for _, v := range c.QueryArray("f") {
+
 		keyval := strings.Split(v, ":")
 		var element core.QuerySliceElement
 		element.Key = keyval[0]
@@ -134,25 +136,52 @@ func (h *MovieHandler) getAll(c *gin.Context) {
 
 	if err := qp.Validate(); err != nil {
 		h.logger.Debugw("validation", "error", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
 		return
 	}
 
-	movieList, err := h.service.GetList(qp)
-	if err != nil {
-		if errors.Is(err, core.ErrMovieNotFound) {
-			h.logger.Debugw("bad query", "alert", err.Error())
-			c.JSON(http.StatusOK, gin.H{"alert": err.Error()})
+	if qp.Export == "none" {
+		movieList, err := h.service.GetList(qp)
+		if err != nil {
+			if errors.Is(err, core.ErrMovieNotFound) {
+				h.logger.Debugw("bad query", "alert", err.Error())
+				c.JSON(http.StatusOK, gin.H{"alert": err.Error()})
+
+				return
+			}
+
+			h.logger.Debugw("Service Getlist", "error", err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 
 			return
 		}
 
-		h.logger.Debugw("Service Getlist", "error", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusOK, movieList)
+	} else {
+		movieList, err := h.service.GetCSV(qp)
+		if err != nil {
+			if errors.Is(err, core.ErrMovieNotFound) {
+				h.logger.Debugw("bad query", "alert", err.Error())
+				c.JSON(http.StatusOK, gin.H{"alert": err.Error()})
 
-		return
+				return
+			}
+
+			h.logger.Debugw("Service Getlist", "error", err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+			return
+		}
+
+		csvList, err := gocsv.MarshalBytes(movieList)
+		if err != nil {
+			h.logger.Debugw("Marshal CSV", "error", err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+			return
+		}
+
+		c.Data(http.StatusOK, "text/csv; charset=utf-8", csvList)
 	}
-
-	c.JSON(http.StatusOK, movieList)
 }

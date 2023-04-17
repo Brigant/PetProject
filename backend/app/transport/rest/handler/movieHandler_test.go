@@ -323,7 +323,7 @@ func TestMovie_getAll(t *testing.T) {
 		expectedResponseBody string
 	}{
 		"Successful case": {
-			queryPath: "/movie/?offset=1&limit=50&f[genre]=comedy&f[rate]=2&s[rate]=asc&s[duration]=dsc&s[release_date]=asc",
+			queryPath: "/movie/?offset=1&limit=50&f=genre:comedy&f=rate:2&s=rate:asc&s=duration:desc&s=release_date:asc",
 			mockBehavior: func(s *MockMovieService) {
 				s.EXPECT().GetList(gomock.Any()).Return([]core.Movie{
 					{ID: "movie-id-1"},
@@ -333,7 +333,7 @@ func TestMovie_getAll(t *testing.T) {
 			expectedResponseBody: `[{"id":"movie-id-1","title":"","genre":"","director_id":"","rate":0,"release_date":"","duration":0,"created":"","modified":""}]`,
 		},
 		"Internal Server error": {
-			queryPath: "/movie/?f[genre]=comedy",
+			queryPath: "/movie/?f=genre:comedy",
 			mockBehavior: func(s *MockMovieService) {
 				s.EXPECT().GetList(gomock.Any()).Return(nil,
 					errors.New("some error")).Times(1)
@@ -342,7 +342,7 @@ func TestMovie_getAll(t *testing.T) {
 			expectedResponseBody: `{"error":"some error"}`,
 		},
 		"Alert emtpty return": {
-			queryPath: "/movie/?f[genre]=comedy",
+			queryPath: "/movie/?f=genre:comedy",
 			mockBehavior: func(s *MockMovieService) {
 				s.EXPECT().GetList(gomock.Any()).Return(nil,
 					core.ErrMovieNotFound).Times(1)
@@ -351,31 +351,32 @@ func TestMovie_getAll(t *testing.T) {
 			expectedResponseBody: `{"alert":"no movie was found"}`,
 		},
 		"Wronge filter key": {
-			queryPath:            "/movie/?f[gAnre]=comedy",
-			mockBehavior:         func(s *MockMovieService) {},
+			queryPath: "/movie/?f=wronKey:comedy",
+			mockBehavior: func(s *MockMovieService) {
+			},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"error":"unallowed filter key"}`,
 		},
 		"Wronge rate value": {
-			queryPath:            "/movie/?f[rate]=badData",
+			queryPath:            "/movie/?f=rate:badData",
 			mockBehavior:         func(s *MockMovieService) {},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"error":"the value shlould be an integer: strconv.Atoi: parsing \"badData\": invalid syntax"}`,
 		},
 		"Rate value outrange": {
-			queryPath:            "/movie/?f[rate]=11",
+			queryPath:            "/movie/?f=rate:11",
 			mockBehavior:         func(s *MockMovieService) {},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"error":"the value should be in range from 1 to 10 :unallowed rate value"}`,
 		},
 		"Wrong sort key": {
-			queryPath:            "/movie/?s[wrong]=asc",
+			queryPath:            "/movie/?s=wrong:asc",
 			mockBehavior:         func(s *MockMovieService) {},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"error":"key wrong is bad: unallowed sort"}`,
 		},
 		"Wrong sort value": {
-			queryPath:            "/movie/?s[duration]=value",
+			queryPath:            "/movie/?s=duration:value",
 			mockBehavior:         func(s *MockMovieService) {},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"error":"the sort value: unallowed sort"}`,
@@ -391,6 +392,31 @@ func TestMovie_getAll(t *testing.T) {
 			mockBehavior:         func(s *MockMovieService) {},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"error":"offset should be in range from 0 to 1000: unallowed offset"}`,
+		},
+		"Export wrong value": {
+			queryPath:            "/movie/?export=xls",
+			mockBehavior:         func(s *MockMovieService) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"error":"value xls: unallowed export value"}`,
+		},
+		"Successful export": {
+			queryPath: "/movie/?export=csv",
+			mockBehavior: func(s *MockMovieService) {
+				s.EXPECT().GetCSV(gomock.Any()).Return([]core.MovieCSV{
+					{Title: "supermovie"},
+				}, nil).Times(1)
+			},
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: "Number,Title,Genre,Director,Rate,Release_Date,Duration/Min\n0,supermovie,,,0,0001-01-01,0\n",
+		},
+		"UnSuccessful export": {
+			queryPath: "/movie/?export=csv",
+			mockBehavior: func(s *MockMovieService) {
+				s.EXPECT().GetCSV(gomock.Any()).Return(nil,
+					errors.New("some error")).Times(1)
+			},
+			expectedStatusCode:   http.StatusInternalServerError,
+			expectedResponseBody: `{"error":"some error"}`,
 		},
 	}
 

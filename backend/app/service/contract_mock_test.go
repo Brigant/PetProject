@@ -242,18 +242,18 @@ func (mr *MockMovieStorageMockRecorder) InsertMovie(movie interface{}) *gomock.C
 }
 
 // SelectAllMovies mocks base method.
-func (m *MockMovieStorage) SelectAllMovies(ord string) ([]core.Movie, error) {
+func (m *MockMovieStorage) SelectAllMovies(arg0 core.QueryParams) ([]core.Movie, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectAllMovies", ord)
+	ret := m.ctrl.Call(m, "SelectAllMovies", arg0)
 	ret0, _ := ret[0].([]core.Movie)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SelectAllMovies indicates an expected call of SelectAllMovies.
-func (mr *MockMovieStorageMockRecorder) SelectAllMovies(ord interface{}) *gomock.Call {
+func (mr *MockMovieStorageMockRecorder) SelectAllMovies(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectAllMovies", reflect.TypeOf((*MockMovieStorage)(nil).SelectAllMovies), ord)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectAllMovies", reflect.TypeOf((*MockMovieStorage)(nil).SelectAllMovies), arg0)
 }
 
 // SelectMovieByID mocks base method.
@@ -269,4 +269,19 @@ func (m *MockMovieStorage) SelectMovieByID(movieID string) (core.Movie, error) {
 func (mr *MockMovieStorageMockRecorder) SelectMovieByID(movieID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectMovieByID", reflect.TypeOf((*MockMovieStorage)(nil).SelectMovieByID), movieID)
+}
+
+// SelectMoviesCSV mocks base method.
+func (m *MockMovieStorage) SelectMoviesCSV(qp core.QueryParams) ([]core.MovieCSV, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectMoviesCSV", qp)
+	ret0, _ := ret[0].([]core.MovieCSV)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectMoviesCSV indicates an expected call of SelectMoviesCSV.
+func (mr *MockMovieStorageMockRecorder) SelectMoviesCSV(qp interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectMoviesCSV", reflect.TypeOf((*MockMovieStorage)(nil).SelectMoviesCSV), qp)
 }

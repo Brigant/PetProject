@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/Brigant/PetPorject/backend/app/core"
 	"github.com/jmoiron/sqlx"
@@ -69,13 +71,15 @@ func (d MovieDB) SelectMovieByID(movieID string) (core.Movie, error) {
 	return movie, nil
 }
 
-func (d MovieDB) SelectAllMovies(param string) ([]core.Movie, error) {
+func (d MovieDB) SelectAllMovies(qp core.QueryParams) ([]core.Movie, error) {
+	queryCondition := d.makeConditionQuery(qp)
+
 	query := `SELECT id, director_id, title, genre, rate, release_date, duration, created, modified FROM public.movie `
 
-	query = query + param
+	fullQuery := query + queryCondition
 
 	var movieList []core.Movie
-	if err := d.db.Select(&movieList, query); err != nil {
+	if err := d.db.Select(&movieList, fullQuery); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, core.ErrMovieNotFound
 		}
@@ -84,4 +88,84 @@ func (d MovieDB) SelectAllMovies(param string) ([]core.Movie, error) {
 	}
 
 	return movieList, nil
+}
+
+func (d MovieDB) SelectMoviesCSV(qp core.QueryParams) ([]core.MovieCSV, error) {
+	queryCondition := d.makeConditionQuery(qp)
+
+	query := `SELECT m.title, m.genre, d.name as director_name, m.rate, m.release_date, m.duration FROM public.movie AS m
+		INNER JOIN public.director AS d ON d.id=m.director_id `
+
+	fullQuery := query + queryCondition
+
+	var csvList []core.MovieCSV
+
+	rows, err := d.db.DB.Query(fullQuery)
+	if err != nil {
+		return nil, fmt.Errorf("error while Query: %w", err)
+	}
+
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("rows.Err(): %w", err)
+	}
+
+	for rows.Next() {
+		var movie core.MovieCSV
+		if err := rows.Scan(
+			&movie.Title,
+			&movie.Genre,
+			&movie.DirectorName,
+			&movie.Rate,
+			&movie.ReleaseDate.Time,
+			&movie.Duration); err != nil {
+			return nil, fmt.Errorf("error while scan director list: %w", err)
+		}
+
+		csvList = append(csvList, movie)
+	}
+
+	defer rows.Close()
+
+	return csvList, nil
+}
+
+func (d MovieDB) makeConditionQuery(qp core.QueryParams) string {
+	var queryCondition string
+
+	if len(qp.Filter) > 0 {
+		where := "WHERE "
+
+		for i := 0; i < len(qp.Filter); i++ {
+			if qp.Filter[i].Val != "" {
+				if _, err := strconv.Atoi(qp.Filter[i].Val); err == nil {
+					where = where + qp.Filter[i].Key + ">=" + qp.Filter[i].Val + " AND "
+				} else {
+					where = where + qp.Filter[i].Key + "='" + qp.Filter[i].Val + "' AND "
+				}
+			}
+		}
+
+		where = strings.TrimSuffix(where, "AND ")
+
+		queryCondition = queryCondition + where
+	}
+
+	if len(qp.Sort) > 0 {
+		order := "ORDER BY "
+
+		for i := 0; i < len(qp.Sort); i++ {
+			if qp.Sort[i].Val != "" {
+				order = order + qp.Sort[i].Key + " " + qp.Sort[i].Val + ", "
+			}
+		}
+
+		order = strings.TrimSuffix(order, ", ")
+
+		queryCondition = queryCondition + order
+	}
+
+	queryCondition = queryCondition + " LIMIT " + qp.Limit
+	queryCondition = queryCondition + " OFFSET " + qp.Offset
+
+	return queryCondition
 }

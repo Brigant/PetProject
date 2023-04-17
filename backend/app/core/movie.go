@@ -1,9 +1,11 @@
 package core
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 type Movie struct {
@@ -46,6 +48,52 @@ type QuerySliceElement struct {
 	Val string
 }
 
+type MovieCSV struct {
+	Number       int      `csv:"Number"`
+	Title        string   `csv:"Title" db:"title"`
+	Genre        string   `csv:"Genre" db:"genre"`
+	DirectorName string   `csv:"Director" db:"director_name"`
+	Rate         int      `csv:"Rate" db:"rate"`
+	ReleaseDate  DateTime `csv:"Release_Date" db:"release_date"`
+	Duration     int      `csv:"Duration/Min" db:"duration"`
+}
+
+type DateTime struct {
+	time.Time
+}
+
+// Convert the internal date as CSV string
+func (date *DateTime) MarshalCSV() (string, error) {
+	return date.Time.Format("2006-01-02"), nil
+}
+
+func (date *DateTime) UnmarshalCSV(csv string) (err error) {
+	date.Time, err = time.Parse("2006-01-02", csv)
+	return err
+}
+
+func (date DateTime) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("\"%s\"", date.Time.Format("2006-01-02"))), nil
+}
+
+func (date *DateTime) UnmarshalJSON(data []byte) error {
+	var rawDate string
+
+	err := json.Unmarshal(data, &rawDate)
+	if err != nil {
+		return fmt.Errorf("custom unmarshal error: %w", err)
+	}
+
+	parsedDate, err := time.Parse("2006-01-02", rawDate)
+	if err != nil {
+		return fmt.Errorf("date parsing error: %w", err)
+	}
+
+	*date = DateTime{parsedDate}
+
+	return nil
+}
+
 // Set the default values to the Limit and Offset fields.
 func (qp *QueryParams) SetDefaultValues() {
 	if qp.Limit == "" {
@@ -54,6 +102,10 @@ func (qp *QueryParams) SetDefaultValues() {
 
 	if qp.Offset == "" {
 		qp.Offset = "0"
+	}
+
+	if qp.Export == "" {
+		qp.Export = "none"
 	}
 }
 
@@ -68,7 +120,7 @@ func (qp QueryParams) Validate() error {
 		allowedFilterKey   = []string{"genre", "rate"}
 		allowedSortKey     = []string{"rate", "release_date", "duration"}
 		allowedSortValue   = []string{"asc", "desc"}
-		allowedExportValue = []string{"csv", ""}
+		allowedExportValue = []string{"csv", "none"}
 	)
 
 	if notInSlice(qp.Limit, allowedLimitVal) {
@@ -83,7 +135,7 @@ func (qp QueryParams) Validate() error {
 	if offset < minOffset || offset > maxOffset {
 		return fmt.Errorf("offset should be in range from %v to %v: %w", minOffset, maxOffset, ErrUnallowedOffset)
 	}
-
+	
 	for _, elem := range qp.Filter {
 		if notInSlice(elem.Key, allowedFilterKey) {
 			return ErrUnallowedFilterKey

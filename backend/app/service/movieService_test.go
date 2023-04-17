@@ -120,16 +120,15 @@ func TestMovieService_get(t *testing.T) {
 }
 
 func TestMovieService_GetList(t *testing.T) {
-	type mockBehavior func(s *MockMovieStorage, queryParams string)
+	type mockBehavior func(s *MockMovieStorage, queryParams core.QueryParams)
 
 	testCasesTable := map[string]struct {
 		queryParams          core.QueryParams
-		queryConfition       string
 		mockBehavior         mockBehavior
 		expectedErrorMessage string
 		wantError            bool
 	}{
-		"Where check": {
+		"Successful case": {
 			queryParams: core.QueryParams{
 				Filter: []core.QuerySliceElement{
 					{Key: "genre", Val: "comedy"},
@@ -138,33 +137,14 @@ func TestMovieService_GetList(t *testing.T) {
 				Limit:  "20",
 				Offset: "1",
 			},
-			mockBehavior: func(s *MockMovieStorage, queryCondition string) {
+			mockBehavior: func(s *MockMovieStorage, queryCondition core.QueryParams) {
 				s.EXPECT().SelectAllMovies(queryCondition).Return([]core.Movie{
 					{ID: "some-movie-id"},
 				}, nil)
 			},
-			queryConfition: `WHERE genre='comedy' AND rate>=5  LIMIT 20 OFFSET 1`,
-			wantError:      false,
+			wantError: false,
 		},
-		"Sort check": {
-			queryParams: core.QueryParams{
-				Sort: []core.QuerySliceElement{
-					{Key: "release_date", Val: "dsc"},
-					{Key: "rate", Val: "asc"},
-					{Key: "duration", Val: "dsc"},
-				},
-				Limit:  "20",
-				Offset: "1",
-			},
-			mockBehavior: func(s *MockMovieStorage, queryCondition string) {
-				s.EXPECT().SelectAllMovies(queryCondition).Return([]core.Movie{
-					{ID: "some-movie-id"},
-				}, nil)
-			},
-			queryConfition: `ORDER BY release_date dsc, rate asc, duration dsc LIMIT 20 OFFSET 1`,
-			wantError:      false,
-		},
-		"Some error": {
+		"Error case": {
 			queryParams: core.QueryParams{
 				Filter: []core.QuerySliceElement{
 					{Key: "genre", Val: "comedy"},
@@ -173,11 +153,10 @@ func TestMovieService_GetList(t *testing.T) {
 				Limit:  "20",
 				Offset: "1",
 			},
-			mockBehavior: func(s *MockMovieStorage, queryCondition string) {
+			mockBehavior: func(s *MockMovieStorage, queryCondition core.QueryParams) {
 				s.EXPECT().SelectAllMovies(queryCondition).Return(nil,
 					errors.New("some error"))
 			},
-			queryConfition:       `WHERE genre='comedy' AND rate>=5  LIMIT 20 OFFSET 1`,
 			expectedErrorMessage: "error while selecting movies: some error",
 			wantError:            true,
 		},
@@ -189,13 +168,80 @@ func TestMovieService_GetList(t *testing.T) {
 			defer ctrl.Finish()
 
 			mStorage := NewMockMovieStorage(ctrl)
-			testCase.mockBehavior(mStorage, testCase.queryConfition)
+			testCase.mockBehavior(mStorage, testCase.queryParams)
 
 			ms := MovieService{
 				movieStorage: mStorage,
 			}
 
 			_, err := ms.GetList(testCase.queryParams)
+
+			if testCase.wantError {
+				assert.EqualError(t, err, testCase.expectedErrorMessage,
+					"We want get an error beceause the storage returned the error")
+			} else {
+				assert.NoError(t, err, "The error should be nil")
+			}
+		})
+	}
+}
+
+func TestMovieService_GetCSV(t *testing.T) {
+	type mockBehavior func(s *MockMovieStorage, queryParams core.QueryParams)
+
+	testCasesTable := map[string]struct {
+		queryParams          core.QueryParams
+		mockBehavior         mockBehavior
+		expectedErrorMessage string
+		wantError            bool
+	}{
+		"Successful case": {
+			queryParams: core.QueryParams{
+				Filter: []core.QuerySliceElement{
+					{Key: "genre", Val: "comedy"},
+					{Key: "rate", Val: "5"},
+				},
+				Limit:  "20",
+				Offset: "1",
+			},
+			mockBehavior: func(s *MockMovieStorage, queryCondition core.QueryParams) {
+				s.EXPECT().SelectMoviesCSV(queryCondition).Return([]core.MovieCSV{
+					{Title: "some-title"},
+				}, nil)
+			},
+			wantError: false,
+		},
+		"Error case": {
+			queryParams: core.QueryParams{
+				Filter: []core.QuerySliceElement{
+					{Key: "genre", Val: "comedy"},
+					{Key: "rate", Val: "5"},
+				},
+				Limit:  "20",
+				Offset: "1",
+			},
+			mockBehavior: func(s *MockMovieStorage, queryCondition core.QueryParams) {
+				s.EXPECT().SelectMoviesCSV(queryCondition).Return(nil,
+					errors.New("some error"))
+			},
+			expectedErrorMessage: "error while SelectMoviesCSV: some error",
+			wantError:            true,
+		},
+	}
+
+	for name, testCase := range testCasesTable {
+		t.Run(name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mStorage := NewMockMovieStorage(ctrl)
+			testCase.mockBehavior(mStorage, testCase.queryParams)
+
+			ms := MovieService{
+				movieStorage: mStorage,
+			}
+
+			_, err := ms.GetCSV(testCase.queryParams)
 
 			if testCase.wantError {
 				assert.EqualError(t, err, testCase.expectedErrorMessage,

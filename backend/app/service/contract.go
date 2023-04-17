@@ -24,6 +24,7 @@ type DirectorStorage interface {
 
 type MovieStorage interface {
 	InsertMovie(movie core.Movie) error
-	SelectAllMovies(ord string) ([]core.Movie, error)
+	SelectAllMovies(core.QueryParams) ([]core.Movie, error)
+	SelectMoviesCSV(qp core.QueryParams) ([]core.MovieCSV, error)
 	SelectMovieByID(movieID string) (core.Movie, error)
 }

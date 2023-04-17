@@ -228,6 +228,21 @@ func (mr *MockMovieServiceMockRecorder) Get(movieID interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockMovieService)(nil).Get), movieID)
 }
 
+// GetCSV mocks base method.
+func (m *MockMovieService) GetCSV(arg0 core.QueryParams) ([]core.MovieCSV, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCSV", arg0)
+	ret0, _ := ret[0].([]core.MovieCSV)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCSV indicates an expected call of GetCSV.
+func (mr *MockMovieServiceMockRecorder) GetCSV(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCSV", reflect.TypeOf((*MockMovieService)(nil).GetCSV), arg0)
+}
+
 // GetList mocks base method.
 func (m *MockMovieService) GetList(arg0 core.QueryParams) ([]core.Movie, error) {
 	m.ctrl.T.Helper()
