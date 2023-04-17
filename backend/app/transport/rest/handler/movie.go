@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -107,59 +108,17 @@ func (h *MovieHandler) get(c *gin.Context) {
 // /movie/?offset=3&f=genre:comedy&f=rate:10&s=duration:desc&s=rate:asc&s=release_date:asc&limit=100&export=csv
 // The allowed values for s[...] are "desc" or "asc", for export: "csv" or "none".
 func (h *MovieHandler) getAll(c *gin.Context) {
-	var qp core.QueryParams
-
-	qp.Limit = c.Query("limit")
-	qp.Offset = c.Query("offset")
-	qp.Export = c.Query("export")
-
-	for _, v := range c.QueryArray("f") {
-
-		keyval := strings.Split(v, ":")
-		var element core.QuerySliceElement
-		element.Key = keyval[0]
-		element.Val = keyval[1]
-
-		qp.Filter = append(qp.Filter, element)
-	}
-
-	for _, v := range c.QueryArray("s") {
-		keyval := strings.Split(v, ":")
-		var element core.QuerySliceElement
-		element.Key = keyval[0]
-		element.Val = keyval[1]
-
-		qp.Sort = append(qp.Sort, element)
-	}
-
-	qp.SetDefaultValues()
-
-	if err := qp.Validate(); err != nil {
-		h.logger.Debugw("validation", "error", err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	queryParameter, err := h.prepareQueryParams(c)
+	if err != nil {
+		h.logger.Debugw("prepareQueryParams", "error", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
 		return
 	}
 
-	if qp.Export == "none" {
-		movieList, err := h.service.GetList(qp)
-		if err != nil {
-			if errors.Is(err, core.ErrMovieNotFound) {
-				h.logger.Debugw("bad query", "alert", err.Error())
-				c.JSON(http.StatusOK, gin.H{"alert": err.Error()})
-
-				return
-			}
-
-			h.logger.Debugw("Service Getlist", "error", err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-
-			return
-		}
-
-		c.JSON(http.StatusOK, movieList)
-	} else {
-		movieList, err := h.service.GetCSV(qp)
+	switch queryParameter.Export {
+	case "scv":
+		movieList, err := h.service.GetCSV(queryParameter)
 		if err != nil {
 			if errors.Is(err, core.ErrMovieNotFound) {
 				h.logger.Debugw("bad query", "alert", err.Error())
@@ -183,5 +142,61 @@ func (h *MovieHandler) getAll(c *gin.Context) {
 		}
 
 		c.Data(http.StatusOK, "text/csv; charset=utf-8", csvList)
+
+	default:
+		movieList, err := h.service.GetList(queryParameter)
+		if err != nil {
+			if errors.Is(err, core.ErrMovieNotFound) {
+				h.logger.Debugw("bad query", "alert", err.Error())
+				c.JSON(http.StatusOK, gin.H{"alert": err.Error()})
+
+				return
+			}
+
+			h.logger.Debugw("Service Getlist", "error", err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+			return
+		}
+
+		c.JSON(http.StatusOK, movieList)
 	}
+}
+
+func (h MovieHandler) prepareQueryParams(c *gin.Context) (core.QueryParams, error) {
+	var queryParameter core.QueryParams
+
+	queryParameter.Limit = c.Query("limit")
+	queryParameter.Offset = c.Query("offset")
+	queryParameter.Export = c.Query("export")
+
+	for _, v := range c.QueryArray("f") {
+		keyval := strings.Split(v, ":")
+
+		var element core.QuerySliceElement
+
+		element.Key = keyval[0]
+		element.Val = keyval[1]
+
+		queryParameter.Filter = append(queryParameter.Filter, element)
+	}
+
+	for _, v := range c.QueryArray("s") {
+		keyval := strings.Split(v, ":")
+
+		var element core.QuerySliceElement
+
+		element.Key = keyval[0]
+		element.Val = keyval[1]
+
+		queryParameter.Sort = append(queryParameter.Sort, element)
+	}
+
+	queryParameter.SetDefaultValues()
+
+	if err := queryParameter.Validate(); err != nil {
+		return core.QueryParams{}, fmt.Errorf("query preparetion failed: %w", err)
+	}
+
+	return queryParameter, nil
 }

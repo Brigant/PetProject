@@ -129,43 +129,43 @@ func (d MovieDB) SelectMoviesCSV(qp core.QueryParams) ([]core.MovieCSV, error) {
 	return csvList, nil
 }
 
-func (d MovieDB) makeConditionQuery(qp core.QueryParams) string {
+func (d MovieDB) makeConditionQuery(queryParameter core.QueryParams) string {
 	var queryCondition string
 
-	if len(qp.Filter) > 0 {
+	if len(queryParameter.Filter) > 0 {
 		where := "WHERE "
 
-		for i := 0; i < len(qp.Filter); i++ {
-			if qp.Filter[i].Val != "" {
-				if _, err := strconv.Atoi(qp.Filter[i].Val); err == nil {
-					where = where + qp.Filter[i].Key + ">=" + qp.Filter[i].Val + " AND "
+		for i := 0; i < len(queryParameter.Filter); i++ {
+			if queryParameter.Filter[i].Val != "" {
+				if _, err := strconv.Atoi(queryParameter.Filter[i].Val); err == nil {
+					where = where + queryParameter.Filter[i].Key + ">=" + queryParameter.Filter[i].Val + " AND "
 				} else {
-					where = where + qp.Filter[i].Key + "='" + qp.Filter[i].Val + "' AND "
+					where = where + queryParameter.Filter[i].Key + "='" + queryParameter.Filter[i].Val + "' AND "
 				}
 			}
 		}
 
 		where = strings.TrimSuffix(where, "AND ")
 
-		queryCondition = queryCondition + where
+		queryCondition += where
 	}
 
-	if len(qp.Sort) > 0 {
+	if len(queryParameter.Sort) > 0 {
 		order := "ORDER BY "
 
-		for i := 0; i < len(qp.Sort); i++ {
-			if qp.Sort[i].Val != "" {
-				order = order + qp.Sort[i].Key + " " + qp.Sort[i].Val + ", "
+		for i := 0; i < len(queryParameter.Sort); i++ {
+			if queryParameter.Sort[i].Val != "" {
+				order = order + queryParameter.Sort[i].Key + " " + queryParameter.Sort[i].Val + ", "
 			}
 		}
 
 		order = strings.TrimSuffix(order, ", ")
 
-		queryCondition = queryCondition + order
+		queryCondition += order
 	}
 
-	queryCondition = queryCondition + " LIMIT " + qp.Limit
-	queryCondition = queryCondition + " OFFSET " + qp.Offset
+	queryCondition = queryCondition + " LIMIT " + queryParameter.Limit
+	queryCondition = queryCondition + " OFFSET " + queryParameter.Offset
 
 	return queryCondition
 }

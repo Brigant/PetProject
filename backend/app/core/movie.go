@@ -21,6 +21,15 @@ type Movie struct {
 }
 
 var (
+	minOffset               = 0
+	maxOffset               = 1000
+	minRate                 = 0
+	maxRate                 = 10
+	allowedLimitVal         = []string{"20", "50", "100"}
+	allowedFilterKey        = []string{"genre", "rate"}
+	allowedSortKey          = []string{"rate", "release_date", "duration"}
+	allowedSortValue        = []string{"asc", "desc"}
+	allowedExportValue      = []string{"csv", "none"}
 	ErrUnallowedOffset      = errors.New("unallowed offset")
 	ErrUnallowedFilterKey   = errors.New("unallowed filter key")
 	ErrUnallowedSort        = errors.New("unallowed sort")
@@ -62,14 +71,15 @@ type DateTime struct {
 	time.Time
 }
 
-// Convert the internal date as CSV string
+// Convert the internal date as CSV string.
 func (date *DateTime) MarshalCSV() (string, error) {
 	return date.Time.Format("2006-01-02"), nil
 }
 
 func (date *DateTime) UnmarshalCSV(csv string) (err error) {
 	date.Time, err = time.Parse("2006-01-02", csv)
-	return err
+
+	return fmt.Errorf("custom csv unmarshal got an error: %w", err)
 }
 
 func (date DateTime) MarshalJSON() ([]byte, error) {
@@ -110,19 +120,8 @@ func (qp *QueryParams) SetDefaultValues() {
 }
 
 // Validate all fields of the query parameters.
+// nolint: cyclop
 func (qp QueryParams) Validate() error {
-	var (
-		minOffset          = 0
-		maxOffset          = 1000
-		minRate            = 0
-		maxRate            = 10
-		allowedLimitVal    = []string{"20", "50", "100"}
-		allowedFilterKey   = []string{"genre", "rate"}
-		allowedSortKey     = []string{"rate", "release_date", "duration"}
-		allowedSortValue   = []string{"asc", "desc"}
-		allowedExportValue = []string{"csv", "none"}
-	)
-
 	if notInSlice(qp.Limit, allowedLimitVal) {
 		return ErrUnallowedLimit
 	}
@@ -135,7 +134,7 @@ func (qp QueryParams) Validate() error {
 	if offset < minOffset || offset > maxOffset {
 		return fmt.Errorf("offset should be in range from %v to %v: %w", minOffset, maxOffset, ErrUnallowedOffset)
 	}
-	
+
 	for _, elem := range qp.Filter {
 		if notInSlice(elem.Key, allowedFilterKey) {
 			return ErrUnallowedFilterKey
