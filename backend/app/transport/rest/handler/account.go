@@ -32,9 +32,7 @@ type inputRefreshToken struct {
 	RefreshToken uuid.UUID `json:"refreshToken"`
 }
 
-var (
-	errInvalidRefreshToken   = errors.New("invalid refresh token")
-)
+var errInvalidRefreshToken = errors.New("invalid refresh token")
 
 func (h AccountHandler) singUp(c *gin.Context) {
 	var account core.Account

@@ -28,11 +28,15 @@ func (d ListDB) Insert(list core.MovieList) (string, error) {
 		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeUniqueViolation {
 			return "", core.ErrDuplicateRow
 		}
+
 		return "", fmt.Errorf("insterting error: %w", err)
 	}
+	defer rows.Close()
 
 	var listID string
+
 	rows.Next()
+
 	if err := rows.Scan(&listID); err != nil {
 		return "", fmt.Errorf("error while scaning: %w", err)
 	}

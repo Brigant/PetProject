@@ -32,7 +32,7 @@ func (h *ListHandler) create(c *gin.Context) {
 		return
 	}
 
-	ID, ok := c.Get(userCtx)
+	ctxAccountID, ok := c.Get(userCtx)
 	if !ok {
 		h.logger.Debugw("get from contex: %w", core.ErrContexAccountNotFound)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": core.ErrContexAccountNotFound.Error()})
@@ -40,7 +40,7 @@ func (h *ListHandler) create(c *gin.Context) {
 		return
 	}
 
-	accountID, err := uuid.Parse(ID.(string))
+	accountID, err := uuid.Parse(ctxAccountID.(string))
 	if err != nil {
 		h.logger.Debugw("uuid parse error: %w", err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
