@@ -285,3 +285,41 @@ func (mr *MockMovieStorageMockRecorder) SelectMoviesCSV(qp interface{}) *gomock.
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectMoviesCSV", reflect.TypeOf((*MockMovieStorage)(nil).SelectMoviesCSV), qp)
 }
+
+// MockListSorage is a mock of ListSorage interface.
+type MockListSorage struct {
+	ctrl     *gomock.Controller
+	recorder *MockListSorageMockRecorder
+}
+
+// MockListSorageMockRecorder is the mock recorder for MockListSorage.
+type MockListSorageMockRecorder struct {
+	mock *MockListSorage
+}
+
+// NewMockListSorage creates a new mock instance.
+func NewMockListSorage(ctrl *gomock.Controller) *MockListSorage {
+	mock := &MockListSorage{ctrl: ctrl}
+	mock.recorder = &MockListSorageMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockListSorage) EXPECT() *MockListSorageMockRecorder {
+	return m.recorder
+}
+
+// Insert mocks base method.
+func (m *MockListSorage) Insert(arg0 core.MovieList) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Insert", arg0)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Insert indicates an expected call of Insert.
+func (mr *MockListSorageMockRecorder) Insert(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockListSorage)(nil).Insert), arg0)
+}

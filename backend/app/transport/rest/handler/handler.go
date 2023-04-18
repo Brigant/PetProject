@@ -31,7 +31,7 @@ type Deps struct {
 	AccountService  AccountService
 	DirectorService DirectorService
 	MovieService    MovieService
-	ListsService    ListsService
+	ListService     ListsService
 }
 
 type Handler struct {
@@ -47,7 +47,7 @@ func NewHandler(deps Deps, logger *logger.Logger) Handler {
 		Account:  NewAccountHandler(deps.AccountService, logger),
 		Director: NewDirectorHandler(deps.DirectorService, logger),
 		Movie:    NewMovieHandler(deps.MovieService, logger),
-		List:     NewListHandler(deps.ListsService),
+		List:     NewListHandler(deps.ListService, logger),
 		log:      logger,
 	}
 }

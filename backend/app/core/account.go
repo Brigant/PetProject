@@ -24,9 +24,10 @@ type TokenPair struct {
 const Salt = "BlaBlaBla"
 
 var (
-	ErrDuplicatePhone = errors.New("phone is already exists in the database")
-	ErrUserNotFound   = errors.New("user is not found with such credentials")
-	ErrWrongPassword  = errors.New("wrong passord")
+	ErrDuplicatePhone        = errors.New("phone is already exists in the database")
+	ErrUserNotFound          = errors.New("user is not found with such credentials")
+	ErrWrongPassword         = errors.New("wrong passord")
+	ErrContexAccountNotFound = errors.New("no account found in contex")
 )
 
 func SHA256(password, salt string) string {

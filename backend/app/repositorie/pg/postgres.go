@@ -18,6 +18,7 @@ type Repository struct {
 	AccountDB  AccountDB
 	DirectorDB DirectorDB
 	MovieDB    MovieDB
+	ListDB     ListDB
 }
 
 // NewPostgresDB function returns object of datatabase.
@@ -37,5 +38,6 @@ func NewRepository(db *sqlx.DB) Repository {
 		AccountDB:  NewAccountDB(db),
 		DirectorDB: NewDirectorDB(db),
 		MovieDB:    NewMovieDB(db),
+		ListDB:     NewListDB(db),
 	}
 }

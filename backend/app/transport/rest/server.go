@@ -52,6 +52,7 @@ func SetupAndRun() error {
 			AccountStorage:  storage.AccountDB,
 			DirectorStorage: storage.DirectorDB,
 			MovieStorage:    storage.MovieDB,
+			ListSorage:      storage.ListDB,
 		})
 
 	restHandlers := handler.NewHandler(
@@ -59,6 +60,7 @@ func SetupAndRun() error {
 			DirectorService: services.Director,
 			AccountService:  services.Account,
 			MovieService:    services.Movie,
+			ListService:     services.List,
 		}, logger)
 
 	routes := restHandlers.InitRouter(cfg.Server.Mode)

@@ -281,17 +281,17 @@ func (m *MockListsService) EXPECT() *MockListsServiceMockRecorder {
 	return m.recorder
 }
 
-// CreateMovie mocks base method.
-func (m *MockListsService) CreateMovie() (string, error) {
+// Create mocks base method.
+func (m *MockListsService) Create(list core.MovieList) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateMovie")
+	ret := m.ctrl.Call(m, "Create", list)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CreateMovie indicates an expected call of CreateMovie.
-func (mr *MockListsServiceMockRecorder) CreateMovie() *gomock.Call {
+// Create indicates an expected call of Create.
+func (mr *MockListsServiceMockRecorder) Create(list interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMovie", reflect.TypeOf((*MockListsService)(nil).CreateMovie))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockListsService)(nil).Create), list)
 }
