@@ -15,4 +15,20 @@ type MovieList struct {
 	Modified  string    `json:"modified" db:"modified"`
 }
 
-var ErrDuplicateRow = errors.New("the account has that list type")
+var (
+	ErrDuplicateRow       = errors.New("the account has that list type")
+	ErrEmptyMovieListType = errors.New("the movie list type should't be empty")
+	ErrEpmtryMovieID      = errors.New("the movie ID should't be empty")
+)
+
+func (ml MovieList) Validate() error {
+	if ml.Type == "" {
+		return ErrEmptyMovieListType
+	}
+
+	if ml.MovieID == uuid.Nil {
+		return ErrEpmtryMovieID
+	}
+
+	return nil
+}

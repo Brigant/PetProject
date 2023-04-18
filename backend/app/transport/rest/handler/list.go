@@ -35,6 +35,9 @@ func (h *ListHandler) create(c *gin.Context) {
 	ID, ok := c.Get(userCtx)
 	if !ok {
 		h.logger.Debugw("get from contex: %w", core.ErrContexAccountNotFound)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": core.ErrContexAccountNotFound.Error()})
+
+		return
 	}
 
 	accountID, err := uuid.Parse(ID.(string))
@@ -46,6 +49,13 @@ func (h *ListHandler) create(c *gin.Context) {
 	}
 
 	list.AccountID = accountID
+
+	if err := list.Validate(); err != nil {
+		h.logger.Debugw("list validation: %w", err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		return
+	}
 
 	listID, err := h.service.Create(list)
 	if err != nil {
