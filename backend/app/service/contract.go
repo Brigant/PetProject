@@ -28,3 +28,7 @@ type MovieStorage interface {
 	SelectMoviesCSV(qp core.QueryParams) ([]core.MovieCSV, error)
 	SelectMovieByID(movieID string) (core.Movie, error)
 }
+
+type ListSorage interface {
+	Insert(core.MovieList) (string, error)
+}

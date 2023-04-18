@@ -26,5 +26,5 @@ type MovieService interface {
 }
 
 type ListsService interface {
-	CreateMovie() (string, error)
+	Create(list core.MovieList) (string, error)
 }
