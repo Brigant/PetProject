@@ -2,7 +2,10 @@ package pg
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
+	"github.com/Brigant/PetPorject/backend/app/core"
 	"github.com/Brigant/PetPorject/backend/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // nececarry blank import
@@ -40,4 +43,45 @@ func NewRepository(db *sqlx.DB) Repository {
 		MovieDB:    NewMovieDB(db),
 		ListDB:     NewListDB(db),
 	}
+}
+
+func makeConditionQuery(queryParameter core.QueryParams) string {
+	var queryCondition string
+
+	if len(queryParameter.Filter) > 0 {
+		where := "WHERE "
+
+		for i := 0; i < len(queryParameter.Filter); i++ {
+			if queryParameter.Filter[i].Val != "" {
+				if _, err := strconv.Atoi(queryParameter.Filter[i].Val); err == nil {
+					where = where + queryParameter.Filter[i].Key + ">=" + queryParameter.Filter[i].Val + " AND "
+				} else {
+					where = where + queryParameter.Filter[i].Key + "='" + queryParameter.Filter[i].Val + "' AND "
+				}
+			}
+		}
+
+		where = strings.TrimSuffix(where, "AND ")
+
+		queryCondition += where
+	}
+
+	if len(queryParameter.Sort) > 0 {
+		order := "ORDER BY "
+
+		for i := 0; i < len(queryParameter.Sort); i++ {
+			if queryParameter.Sort[i].Val != "" {
+				order = order + queryParameter.Sort[i].Key + " " + queryParameter.Sort[i].Val + ", "
+			}
+		}
+
+		order = strings.TrimSuffix(order, ", ")
+
+		queryCondition += order
+	}
+
+	queryCondition = queryCondition + " LIMIT " + queryParameter.Limit
+	queryCondition = queryCondition + " OFFSET " + queryParameter.Offset
+
+	return queryCondition
 }

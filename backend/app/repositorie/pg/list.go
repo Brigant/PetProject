@@ -18,7 +18,6 @@ func NewListDB(db *sqlx.DB) ListDB {
 }
 
 func (d ListDB) Insert(list core.MovieList) (string, error) {
-	// _ = list
 	query := `INSERT INTO public.list(type, account_id, movie_id)
 		VALUES(:type, :account_id, :movie_id) RETURNING id`
 
@@ -43,3 +42,31 @@ func (d ListDB) Insert(list core.MovieList) (string, error) {
 
 	return listID, nil
 }
+
+// func (d ListDB) SelectMovieListByAccountID(accountID string) ([]core.MovieList, error) {
+// 	query := `INSERT INTO public.list(type, account_id, movie_id)
+// 		VALUES(:type, :account_id, :movie_id) RETURNING id`
+
+// 	conditionQuery()
+	
+// 	rows, err := d.db.NamedQuery(query, &list)
+// 	if err != nil {
+// 		pqErr := new(pq.Error)
+// 		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeUniqueViolation {
+// 			return "", core.ErrDuplicateRow
+// 		}
+
+// 		return "", fmt.Errorf("insterting error: %w", err)
+// 	}
+// 	defer rows.Close()
+
+// 	var listID string
+
+// 	rows.Next()
+
+// 	if err := rows.Scan(&listID); err != nil {
+// 		return "", fmt.Errorf("error while scaning: %w", err)
+// 	}
+
+// 	return listID, nil
+// }

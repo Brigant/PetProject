@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/Brigant/PetPorject/backend/app/core"
 	"github.com/jmoiron/sqlx"
@@ -72,7 +70,7 @@ func (d MovieDB) SelectMovieByID(movieID string) (core.Movie, error) {
 }
 
 func (d MovieDB) SelectAllMovies(qp core.QueryParams) ([]core.Movie, error) {
-	queryCondition := d.makeConditionQuery(qp)
+	queryCondition := makeConditionQuery(qp)
 
 	query := `SELECT id, director_id, title, genre, rate, release_date, duration, created, modified FROM public.movie `
 
@@ -91,7 +89,7 @@ func (d MovieDB) SelectAllMovies(qp core.QueryParams) ([]core.Movie, error) {
 }
 
 func (d MovieDB) SelectMoviesCSV(qp core.QueryParams) ([]core.MovieCSV, error) {
-	queryCondition := d.makeConditionQuery(qp)
+	queryCondition := makeConditionQuery(qp)
 
 	query := `SELECT m.title, m.genre, d.name as director_name, m.rate, m.release_date, m.duration FROM public.movie AS m
 		INNER JOIN public.director AS d ON d.id=m.director_id `
@@ -127,45 +125,4 @@ func (d MovieDB) SelectMoviesCSV(qp core.QueryParams) ([]core.MovieCSV, error) {
 	defer rows.Close()
 
 	return csvList, nil
-}
-
-func (d MovieDB) makeConditionQuery(queryParameter core.QueryParams) string {
-	var queryCondition string
-
-	if len(queryParameter.Filter) > 0 {
-		where := "WHERE "
-
-		for i := 0; i < len(queryParameter.Filter); i++ {
-			if queryParameter.Filter[i].Val != "" {
-				if _, err := strconv.Atoi(queryParameter.Filter[i].Val); err == nil {
-					where = where + queryParameter.Filter[i].Key + ">=" + queryParameter.Filter[i].Val + " AND "
-				} else {
-					where = where + queryParameter.Filter[i].Key + "='" + queryParameter.Filter[i].Val + "' AND "
-				}
-			}
-		}
-
-		where = strings.TrimSuffix(where, "AND ")
-
-		queryCondition += where
-	}
-
-	if len(queryParameter.Sort) > 0 {
-		order := "ORDER BY "
-
-		for i := 0; i < len(queryParameter.Sort); i++ {
-			if queryParameter.Sort[i].Val != "" {
-				order = order + queryParameter.Sort[i].Key + " " + queryParameter.Sort[i].Val + ", "
-			}
-		}
-
-		order = strings.TrimSuffix(order, ", ")
-
-		queryCondition += order
-	}
-
-	queryCondition = queryCondition + " LIMIT " + queryParameter.Limit
-	queryCondition = queryCondition + " OFFSET " + queryParameter.Offset
-
-	return queryCondition
 }
