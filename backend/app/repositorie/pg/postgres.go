@@ -45,7 +45,7 @@ func NewRepository(db *sqlx.DB) Repository {
 	}
 }
 
-func makeConditionQuery(queryParameter core.QueryParams) string {
+func buildQueryCondition(queryParameter core.ConditionParams) string {
 	var queryCondition string
 
 	if len(queryParameter.Filter) > 0 {

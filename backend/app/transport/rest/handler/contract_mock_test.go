@@ -229,7 +229,7 @@ func (mr *MockMovieServiceMockRecorder) Get(movieID interface{}) *gomock.Call {
 }
 
 // GetCSV mocks base method.
-func (m *MockMovieService) GetCSV(arg0 core.QueryParams) ([]core.MovieCSV, error) {
+func (m *MockMovieService) GetCSV(arg0 core.ConditionParams) ([]core.MovieCSV, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCSV", arg0)
 	ret0, _ := ret[0].([]core.MovieCSV)
@@ -244,7 +244,7 @@ func (mr *MockMovieServiceMockRecorder) GetCSV(arg0 interface{}) *gomock.Call {
 }
 
 // GetList mocks base method.
-func (m *MockMovieService) GetList(arg0 core.QueryParams) ([]core.Movie, error) {
+func (m *MockMovieService) GetList(arg0 core.ConditionParams) ([]core.Movie, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetList", arg0)
 	ret0, _ := ret[0].([]core.Movie)

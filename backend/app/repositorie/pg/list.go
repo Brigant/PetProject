@@ -43,30 +43,33 @@ func (d ListDB) Insert(list core.MovieList) (string, error) {
 	return listID, nil
 }
 
-// func (d ListDB) SelectMovieListByAccountID(accountID string) ([]core.MovieList, error) {
-// 	query := `INSERT INTO public.list(type, account_id, movie_id)
-// 		VALUES(:type, :account_id, :movie_id) RETURNING id`
+func (d ListDB) SelectMovieListByAccountID(accountID string, queryParam core.ConditionParams) ([]core.MovieList, error) {
+	var list []core.MovieList
 
-// 	conditionQuery()
-	
-// 	rows, err := d.db.NamedQuery(query, &list)
-// 	if err != nil {
-// 		pqErr := new(pq.Error)
-// 		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeUniqueViolation {
-// 			return "", core.ErrDuplicateRow
-// 		}
+	query := ``
 
-// 		return "", fmt.Errorf("insterting error: %w", err)
-// 	}
-// 	defer rows.Close()
+	condition := buildQueryCondition(queryParam)
 
-// 	var listID string
+	query += condition
 
-// 	rows.Next()
+	rows, err := d.db.NamedQuery(query, &list)
+	if err != nil {
+		pqErr := new(pq.Error)
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeUniqueViolation {
+			return nil, core.ErrDuplicateRow
+		}
 
-// 	if err := rows.Scan(&listID); err != nil {
-// 		return "", fmt.Errorf("error while scaning: %w", err)
-// 	}
+		return nil, fmt.Errorf("insterting error: %w", err)
+	}
+	defer rows.Close()
 
-// 	return listID, nil
-// }
+	var listID string
+
+	rows.Next()
+
+	if err := rows.Scan(&listID); err != nil {
+		return nil, fmt.Errorf("error while scaning: %w", err)
+	}
+
+	return list, nil
+}

@@ -17,6 +17,7 @@ func TestNew(t *testing.T) {
 		AccountStorage:  NewMockAccountStorage(ctrl),
 		DirectorStorage: NewMockDirectorStorage(ctrl),
 		MovieStorage:    NewMockMovieStorage(ctrl),
+		ListSorage:      NewMockListSorage(ctrl),
 	}
 
 	service := New(deps)

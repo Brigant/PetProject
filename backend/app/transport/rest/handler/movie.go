@@ -117,7 +117,7 @@ func (h *MovieHandler) getAll(c *gin.Context) {
 	}
 
 	switch queryParameter.Export {
-	case "scv":
+	case "csv":
 		movieList, err := h.service.GetCSV(queryParameter)
 		if err != nil {
 			if errors.Is(err, core.ErrMovieNotFound) {
@@ -163,8 +163,13 @@ func (h *MovieHandler) getAll(c *gin.Context) {
 	}
 }
 
-func (h MovieHandler) prepareQueryParams(c *gin.Context) (core.QueryParams, error) {
-	var queryParameter core.QueryParams
+func (h MovieHandler) prepareQueryParams(c *gin.Context) (core.ConditionParams, error) {
+	var queryParameter core.ConditionParams
+	queryParameter.CheckList.Export = true
+	queryParameter.CheckList.Filter = true
+	queryParameter.CheckList.Sort = true
+	queryParameter.CheckList.Offset = true
+	queryParameter.CheckList.Limit = true
 
 	queryParameter.Limit = c.Query("limit")
 	queryParameter.Offset = c.Query("offset")
@@ -195,7 +200,7 @@ func (h MovieHandler) prepareQueryParams(c *gin.Context) (core.QueryParams, erro
 	queryParameter.SetDefaultValues()
 
 	if err := queryParameter.Validate(); err != nil {
-		return core.QueryParams{}, fmt.Errorf("query preparetion failed: %w", err)
+		return core.ConditionParams{}, fmt.Errorf("query preparetion failed: %w", err)
 	}
 
 	return queryParameter, nil

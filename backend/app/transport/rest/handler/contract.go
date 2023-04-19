@@ -21,8 +21,8 @@ type DirectorService interface {
 type MovieService interface {
 	CreateMovie(movie core.Movie) error
 	Get(movieID string) (core.Movie, error)
-	GetList(core.QueryParams) ([]core.Movie, error)
-	GetCSV(core.QueryParams) ([]core.MovieCSV, error)
+	GetList(core.ConditionParams) ([]core.Movie, error)
+	GetCSV(core.ConditionParams) ([]core.MovieCSV, error)
 }
 
 type ListsService interface {

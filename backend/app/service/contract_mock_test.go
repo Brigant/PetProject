@@ -242,7 +242,7 @@ func (mr *MockMovieStorageMockRecorder) InsertMovie(movie interface{}) *gomock.C
 }
 
 // SelectAllMovies mocks base method.
-func (m *MockMovieStorage) SelectAllMovies(arg0 core.QueryParams) ([]core.Movie, error) {
+func (m *MockMovieStorage) SelectAllMovies(arg0 core.ConditionParams) ([]core.Movie, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectAllMovies", arg0)
 	ret0, _ := ret[0].([]core.Movie)
@@ -272,7 +272,7 @@ func (mr *MockMovieStorageMockRecorder) SelectMovieByID(movieID interface{}) *go
 }
 
 // SelectMoviesCSV mocks base method.
-func (m *MockMovieStorage) SelectMoviesCSV(qp core.QueryParams) ([]core.MovieCSV, error) {
+func (m *MockMovieStorage) SelectMoviesCSV(qp core.ConditionParams) ([]core.MovieCSV, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectMoviesCSV", qp)
 	ret0, _ := ret[0].([]core.MovieCSV)

@@ -69,8 +69,8 @@ func (d MovieDB) SelectMovieByID(movieID string) (core.Movie, error) {
 	return movie, nil
 }
 
-func (d MovieDB) SelectAllMovies(qp core.QueryParams) ([]core.Movie, error) {
-	queryCondition := makeConditionQuery(qp)
+func (d MovieDB) SelectAllMovies(qp core.ConditionParams) ([]core.Movie, error) {
+	queryCondition := buildQueryCondition(qp)
 
 	query := `SELECT id, director_id, title, genre, rate, release_date, duration, created, modified FROM public.movie `
 
@@ -88,8 +88,8 @@ func (d MovieDB) SelectAllMovies(qp core.QueryParams) ([]core.Movie, error) {
 	return movieList, nil
 }
 
-func (d MovieDB) SelectMoviesCSV(qp core.QueryParams) ([]core.MovieCSV, error) {
-	queryCondition := makeConditionQuery(qp)
+func (d MovieDB) SelectMoviesCSV(qp core.ConditionParams) ([]core.MovieCSV, error) {
+	queryCondition := buildQueryCondition(qp)
 
 	query := `SELECT m.title, m.genre, d.name as director_name, m.rate, m.release_date, m.duration FROM public.movie AS m
 		INNER JOIN public.director AS d ON d.id=m.director_id `

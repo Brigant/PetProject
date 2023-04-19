@@ -120,16 +120,16 @@ func TestMovieService_get(t *testing.T) {
 }
 
 func TestMovieService_GetList(t *testing.T) {
-	type mockBehavior func(s *MockMovieStorage, queryParams core.QueryParams)
+	type mockBehavior func(s *MockMovieStorage, queryParams core.ConditionParams)
 
 	testCasesTable := map[string]struct {
-		queryParams          core.QueryParams
+		queryParams          core.ConditionParams
 		mockBehavior         mockBehavior
 		expectedErrorMessage string
 		wantError            bool
 	}{
 		"Successful case": {
-			queryParams: core.QueryParams{
+			queryParams: core.ConditionParams{
 				Filter: []core.QuerySliceElement{
 					{Key: "genre", Val: "comedy"},
 					{Key: "rate", Val: "5"},
@@ -137,7 +137,7 @@ func TestMovieService_GetList(t *testing.T) {
 				Limit:  "20",
 				Offset: "1",
 			},
-			mockBehavior: func(s *MockMovieStorage, queryCondition core.QueryParams) {
+			mockBehavior: func(s *MockMovieStorage, queryCondition core.ConditionParams) {
 				s.EXPECT().SelectAllMovies(queryCondition).Return([]core.Movie{
 					{ID: "some-movie-id"},
 				}, nil)
@@ -145,7 +145,7 @@ func TestMovieService_GetList(t *testing.T) {
 			wantError: false,
 		},
 		"Error case": {
-			queryParams: core.QueryParams{
+			queryParams: core.ConditionParams{
 				Filter: []core.QuerySliceElement{
 					{Key: "genre", Val: "comedy"},
 					{Key: "rate", Val: "5"},
@@ -153,7 +153,7 @@ func TestMovieService_GetList(t *testing.T) {
 				Limit:  "20",
 				Offset: "1",
 			},
-			mockBehavior: func(s *MockMovieStorage, queryCondition core.QueryParams) {
+			mockBehavior: func(s *MockMovieStorage, queryCondition core.ConditionParams) {
 				s.EXPECT().SelectAllMovies(queryCondition).Return(nil,
 					errors.New("some error"))
 			},
@@ -187,16 +187,16 @@ func TestMovieService_GetList(t *testing.T) {
 }
 
 func TestMovieService_GetCSV(t *testing.T) {
-	type mockBehavior func(s *MockMovieStorage, queryParams core.QueryParams)
+	type mockBehavior func(s *MockMovieStorage, queryParams core.ConditionParams)
 
 	testCasesTable := map[string]struct {
-		queryParams          core.QueryParams
+		queryParams          core.ConditionParams
 		mockBehavior         mockBehavior
 		expectedErrorMessage string
 		wantError            bool
 	}{
 		"Successful case": {
-			queryParams: core.QueryParams{
+			queryParams: core.ConditionParams{
 				Filter: []core.QuerySliceElement{
 					{Key: "genre", Val: "comedy"},
 					{Key: "rate", Val: "5"},
@@ -204,7 +204,7 @@ func TestMovieService_GetCSV(t *testing.T) {
 				Limit:  "20",
 				Offset: "1",
 			},
-			mockBehavior: func(s *MockMovieStorage, queryCondition core.QueryParams) {
+			mockBehavior: func(s *MockMovieStorage, queryCondition core.ConditionParams) {
 				s.EXPECT().SelectMoviesCSV(queryCondition).Return([]core.MovieCSV{
 					{Title: "some-title"},
 				}, nil)
@@ -212,7 +212,7 @@ func TestMovieService_GetCSV(t *testing.T) {
 			wantError: false,
 		},
 		"Error case": {
-			queryParams: core.QueryParams{
+			queryParams: core.ConditionParams{
 				Filter: []core.QuerySliceElement{
 					{Key: "genre", Val: "comedy"},
 					{Key: "rate", Val: "5"},
@@ -220,7 +220,7 @@ func TestMovieService_GetCSV(t *testing.T) {
 				Limit:  "20",
 				Offset: "1",
 			},
-			mockBehavior: func(s *MockMovieStorage, queryCondition core.QueryParams) {
+			mockBehavior: func(s *MockMovieStorage, queryCondition core.ConditionParams) {
 				s.EXPECT().SelectMoviesCSV(queryCondition).Return(nil,
 					errors.New("some error"))
 			},
