@@ -242,7 +242,7 @@ func (mr *MockMovieStorageMockRecorder) InsertMovie(movie interface{}) *gomock.C
 }
 
 // SelectAllMovies mocks base method.
-func (m *MockMovieStorage) SelectAllMovies(arg0 core.QueryParams) ([]core.Movie, error) {
+func (m *MockMovieStorage) SelectAllMovies(arg0 core.ConditionParams) ([]core.Movie, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectAllMovies", arg0)
 	ret0, _ := ret[0].([]core.Movie)
@@ -272,18 +272,18 @@ func (mr *MockMovieStorageMockRecorder) SelectMovieByID(movieID interface{}) *go
 }
 
 // SelectMoviesCSV mocks base method.
-func (m *MockMovieStorage) SelectMoviesCSV(qp core.QueryParams) ([]core.MovieCSV, error) {
+func (m *MockMovieStorage) SelectMoviesCSV(arg0 core.ConditionParams) ([]core.MovieCSV, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectMoviesCSV", qp)
+	ret := m.ctrl.Call(m, "SelectMoviesCSV", arg0)
 	ret0, _ := ret[0].([]core.MovieCSV)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SelectMoviesCSV indicates an expected call of SelectMoviesCSV.
-func (mr *MockMovieStorageMockRecorder) SelectMoviesCSV(qp interface{}) *gomock.Call {
+func (mr *MockMovieStorageMockRecorder) SelectMoviesCSV(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectMoviesCSV", reflect.TypeOf((*MockMovieStorage)(nil).SelectMoviesCSV), qp)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectMoviesCSV", reflect.TypeOf((*MockMovieStorage)(nil).SelectMoviesCSV), arg0)
 }
 
 // MockListSorage is a mock of ListSorage interface.
@@ -322,4 +322,19 @@ func (m *MockListSorage) Insert(arg0 core.MovieList) (string, error) {
 func (mr *MockListSorageMockRecorder) Insert(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockListSorage)(nil).Insert), arg0)
+}
+
+// SelectAllUsersLists mocks base method.
+func (m *MockListSorage) SelectAllUsersLists(arg0 core.ConditionParams) ([]core.MovieList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectAllUsersLists", arg0)
+	ret0, _ := ret[0].([]core.MovieList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectAllUsersLists indicates an expected call of SelectAllUsersLists.
+func (mr *MockListSorageMockRecorder) SelectAllUsersLists(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectAllUsersLists", reflect.TypeOf((*MockListSorage)(nil).SelectAllUsersLists), arg0)
 }

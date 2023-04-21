@@ -229,7 +229,7 @@ func (mr *MockMovieServiceMockRecorder) Get(movieID interface{}) *gomock.Call {
 }
 
 // GetCSV mocks base method.
-func (m *MockMovieService) GetCSV(arg0 core.QueryParams) ([]core.MovieCSV, error) {
+func (m *MockMovieService) GetCSV(arg0 core.ConditionParams) ([]core.MovieCSV, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCSV", arg0)
 	ret0, _ := ret[0].([]core.MovieCSV)
@@ -244,7 +244,7 @@ func (mr *MockMovieServiceMockRecorder) GetCSV(arg0 interface{}) *gomock.Call {
 }
 
 // GetList mocks base method.
-func (m *MockMovieService) GetList(arg0 core.QueryParams) ([]core.Movie, error) {
+func (m *MockMovieService) GetList(arg0 core.ConditionParams) ([]core.Movie, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetList", arg0)
 	ret0, _ := ret[0].([]core.Movie)
@@ -294,4 +294,19 @@ func (m *MockListsService) Create(list core.MovieList) (string, error) {
 func (mr *MockListsServiceMockRecorder) Create(list interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockListsService)(nil).Create), list)
+}
+
+// GetAllAccountLists mocks base method.
+func (m *MockListsService) GetAllAccountLists(arg0 core.ConditionParams) ([]core.MovieList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllAccountLists", arg0)
+	ret0, _ := ret[0].([]core.MovieList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllAccountLists indicates an expected call of GetAllAccountLists.
+func (mr *MockListsServiceMockRecorder) GetAllAccountLists(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllAccountLists", reflect.TypeOf((*MockListsService)(nil).GetAllAccountLists), arg0)
 }

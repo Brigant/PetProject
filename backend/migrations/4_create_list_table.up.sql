@@ -4,7 +4,7 @@ CREATE TABLE "list" (
     "account_id" uuid NOT NULL,
     "type" VARCHAR(255) NOT NULL,
     "created" Timestamp With Time Zone NOT NULL DEFAULT NOW(),
-    "modified" Timestamp With Time Zone,
+    "modified" Timestamp With Time Zone NOT NULL DEFAULT NOW(),
     PRIMARY KEY ("id"),
     CONSTRAINT "unique_list_id" UNIQUE("id"),
     CONSTRAINT "unique_account_id_type" UNIQUE("account_id", "type"),

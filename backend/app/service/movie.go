@@ -36,7 +36,7 @@ func (m MovieService) Get(movieID string) (core.Movie, error) {
 
 // The general meaning of this service is to generate sql query parameter
 // and get the movie list from the database using that query parameter.
-func (m MovieService) GetList(qp core.QueryParams) ([]core.Movie, error) {
+func (m MovieService) GetList(qp core.ConditionParams) ([]core.Movie, error) {
 	movieList, err := m.movieStorage.SelectAllMovies(qp)
 	if err != nil {
 		return nil, fmt.Errorf("error while selecting movies: %w", err)
@@ -46,7 +46,7 @@ func (m MovieService) GetList(qp core.QueryParams) ([]core.Movie, error) {
 }
 
 // Prepare the movie list slice for export.
-func (m MovieService) GetCSV(qp core.QueryParams) ([]core.MovieCSV, error) {
+func (m MovieService) GetCSV(qp core.ConditionParams) ([]core.MovieCSV, error) {
 	const SecondsInMinutes = 60
 
 	movieList, err := m.movieStorage.SelectMoviesCSV(qp)

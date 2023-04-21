@@ -16,7 +16,7 @@ type MovieList struct {
 }
 
 var (
-	ErrDuplicateRow       = errors.New("the account has that list type")
+	ErrDuplicateRow       = errors.New("such record already exists")
 	ErrEmptyMovieListType = errors.New("the movie list type should't be empty")
 	ErrEpmtryMovieID      = errors.New("the movie ID should't be empty")
 )

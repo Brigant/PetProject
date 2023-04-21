@@ -2,7 +2,10 @@ package pg
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
+	"github.com/Brigant/PetPorject/backend/app/core"
 	"github.com/Brigant/PetPorject/backend/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // nececarry blank import
@@ -12,6 +15,7 @@ const (
 	ErrCodeUniqueViolation     = "unique_violation"
 	ErrCodeNoData              = "no_data"
 	ErrCodeForeignKeyViolation = "foreign_key_violation"
+	ErrCodeUndefinedColumn     = "undefined_column"
 )
 
 type Repository struct {
@@ -40,4 +44,45 @@ func NewRepository(db *sqlx.DB) Repository {
 		MovieDB:    NewMovieDB(db),
 		ListDB:     NewListDB(db),
 	}
+}
+
+func buildQueryCondition(condiotion core.ConditionParams) string {
+	var queryCondition string
+
+	if len(condiotion.Filter) > 0 {
+		where := "WHERE "
+
+		for i := 0; i < len(condiotion.Filter); i++ {
+			if condiotion.Filter[i].Val != "" {
+				if _, err := strconv.Atoi(condiotion.Filter[i].Val); err == nil {
+					where = where + condiotion.Filter[i].Key + ">=" + condiotion.Filter[i].Val + " AND "
+				} else {
+					where = where + condiotion.Filter[i].Key + "='" + condiotion.Filter[i].Val + "' AND "
+				}
+			}
+		}
+
+		where = strings.TrimSuffix(where, "AND ")
+
+		queryCondition += where
+	}
+
+	if len(condiotion.Sort) > 0 {
+		order := "ORDER BY "
+
+		for i := 0; i < len(condiotion.Sort); i++ {
+			if condiotion.Sort[i].Val != "" {
+				order = order + condiotion.Sort[i].Key + " " + condiotion.Sort[i].Val + ", "
+			}
+		}
+
+		order = strings.TrimSuffix(order, ", ")
+
+		queryCondition += order
+	}
+
+	queryCondition = queryCondition + " LIMIT " + condiotion.Limit
+	queryCondition = queryCondition + " OFFSET " + condiotion.Offset
+
+	return queryCondition
 }

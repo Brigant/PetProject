@@ -18,7 +18,6 @@ func NewListDB(db *sqlx.DB) ListDB {
 }
 
 func (d ListDB) Insert(list core.MovieList) (string, error) {
-	// _ = list
 	query := `INSERT INTO public.list(type, account_id, movie_id)
 		VALUES(:type, :account_id, :movie_id) RETURNING id`
 
@@ -42,4 +41,25 @@ func (d ListDB) Insert(list core.MovieList) (string, error) {
 	}
 
 	return listID, nil
+}
+
+func (d ListDB) SelectAllUsersLists(queryParam core.ConditionParams) ([]core.MovieList, error) {
+	var list []core.MovieList
+
+	query := `SELECT * FROM public.list `
+
+	condition := buildQueryCondition(queryParam)
+
+	query += condition
+
+	if err := d.db.Select(&list, query); err != nil {
+		pqErr := new(pq.Error)
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeUndefinedColumn {
+			return nil, core.ErrUnkownConditionKey
+		}
+
+		return nil, fmt.Errorf("an error occurs while getting the movie list: %w", err)
+	}
+
+	return list, nil
 }
