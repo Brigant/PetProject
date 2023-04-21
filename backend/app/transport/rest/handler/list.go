@@ -22,6 +22,7 @@ func NewListHandler(s ListsService, log *logger.Logger) ListHandler {
 	}
 }
 
+// Handler for the list creatation.
 func (h *ListHandler) create(c *gin.Context) {
 	var list core.MovieList
 
@@ -79,6 +80,49 @@ func (h *ListHandler) get(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"get": "res"})
 }
 
+// Handler for the movie list getting of the athenticated accaount.
 func (h *ListHandler) getAll(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"getAll": "res"})
+	accountID, ok := c.Get(userCtx)
+	if !ok {
+		h.logger.Debugw("getAll hendler", "error", core.ErrContexAccountNotFound)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": core.ErrContexAccountNotFound.Error()})
+
+		return
+	}
+
+	var conditionParams core.ConditionParams
+
+	if err := conditionParams.Prepare(c); err != nil {
+		h.logger.Debugw("prepareQueryParams", "error", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	conditionParams.Filter = append(conditionParams.Filter, core.QuerySliceElement{Key: "account_id", Val: accountID.(string)})
+
+	movieLists, err := h.service.GetAllAccountLists(conditionParams)
+	if err != nil {
+		if errors.Is(err, core.ErrUnkownConditionKey) {
+			h.logger.Debugw("getAll hendler", "error", err.Error())
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+			return
+
+		}
+
+		h.logger.Debugw("getAll hendler", "error", err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	if movieLists == nil {
+		h.logger.Debugw("getAll result", "alert", core.ErrNotFound.Error())
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"alert": core.ErrNotFound.Error()})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, movieLists)
 }

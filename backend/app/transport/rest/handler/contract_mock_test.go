@@ -295,3 +295,18 @@ func (mr *MockListsServiceMockRecorder) Create(list interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockListsService)(nil).Create), list)
 }
+
+// GetAllAccountLists mocks base method.
+func (m *MockListsService) GetAllAccountLists(arg0 core.ConditionParams) ([]core.MovieList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllAccountLists", arg0)
+	ret0, _ := ret[0].([]core.MovieList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllAccountLists indicates an expected call of GetAllAccountLists.
+func (mr *MockListsServiceMockRecorder) GetAllAccountLists(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllAccountLists", reflect.TypeOf((*MockListsService)(nil).GetAllAccountLists), arg0)
+}

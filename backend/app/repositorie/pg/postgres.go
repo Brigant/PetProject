@@ -15,6 +15,7 @@ const (
 	ErrCodeUniqueViolation     = "unique_violation"
 	ErrCodeNoData              = "no_data"
 	ErrCodeForeignKeyViolation = "foreign_key_violation"
+	ErrCodeUndefinedColumn     = "undefined_column"
 )
 
 type Repository struct {
@@ -45,18 +46,18 @@ func NewRepository(db *sqlx.DB) Repository {
 	}
 }
 
-func buildQueryCondition(queryParameter core.ConditionParams) string {
+func buildQueryCondition(condiotion core.ConditionParams) string {
 	var queryCondition string
 
-	if len(queryParameter.Filter) > 0 {
+	if len(condiotion.Filter) > 0 {
 		where := "WHERE "
 
-		for i := 0; i < len(queryParameter.Filter); i++ {
-			if queryParameter.Filter[i].Val != "" {
-				if _, err := strconv.Atoi(queryParameter.Filter[i].Val); err == nil {
-					where = where + queryParameter.Filter[i].Key + ">=" + queryParameter.Filter[i].Val + " AND "
+		for i := 0; i < len(condiotion.Filter); i++ {
+			if condiotion.Filter[i].Val != "" {
+				if _, err := strconv.Atoi(condiotion.Filter[i].Val); err == nil {
+					where = where + condiotion.Filter[i].Key + ">=" + condiotion.Filter[i].Val + " AND "
 				} else {
-					where = where + queryParameter.Filter[i].Key + "='" + queryParameter.Filter[i].Val + "' AND "
+					where = where + condiotion.Filter[i].Key + "='" + condiotion.Filter[i].Val + "' AND "
 				}
 			}
 		}
@@ -66,12 +67,12 @@ func buildQueryCondition(queryParameter core.ConditionParams) string {
 		queryCondition += where
 	}
 
-	if len(queryParameter.Sort) > 0 {
+	if len(condiotion.Sort) > 0 {
 		order := "ORDER BY "
 
-		for i := 0; i < len(queryParameter.Sort); i++ {
-			if queryParameter.Sort[i].Val != "" {
-				order = order + queryParameter.Sort[i].Key + " " + queryParameter.Sort[i].Val + ", "
+		for i := 0; i < len(condiotion.Sort); i++ {
+			if condiotion.Sort[i].Val != "" {
+				order = order + condiotion.Sort[i].Key + " " + condiotion.Sort[i].Val + ", "
 			}
 		}
 
@@ -80,8 +81,8 @@ func buildQueryCondition(queryParameter core.ConditionParams) string {
 		queryCondition += order
 	}
 
-	queryCondition = queryCondition + " LIMIT " + queryParameter.Limit
-	queryCondition = queryCondition + " OFFSET " + queryParameter.Offset
+	queryCondition = queryCondition + " LIMIT " + condiotion.Limit
+	queryCondition = queryCondition + " OFFSET " + condiotion.Offset
 
 	return queryCondition
 }

@@ -2,17 +2,37 @@ package core
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gin-gonic/gin"
+)
+
+var (
+	minOffset               = 0
+	maxOffset               = 1000
+	minRate                 = 0
+	maxRate                 = 10
+	allowedLimitVal         = []string{"20", "50", "100"}
+	allowedFilterKey        = []string{"genre", "rate", "type", "account_id"}
+	allowedSortKey          = []string{"rate", "release_date", "duration"}
+	allowedSortValue        = []string{"asc", "desc"}
+	allowedExportValue      = []string{"csv", "none"}
+	ErrUnallowedOffset      = errors.New("unallowed offset")
+	ErrUnallowedFilterKey   = errors.New("unallowed filter key")
+	ErrUnallowedSort        = errors.New("unallowed sort")
+	ErrUnallowedLimit       = errors.New("unallowed limit")
+	ErrUnallowedExportValue = errors.New("unallowed export value")
+	ErrUnallowedRateValue   = errors.New("unallowed rate value")
+	ErrUnkownConditionKey   = errors.New("condition has unknown parameters")
 )
 
 // ConditionParams represent request query params
 // that will be used on transport and repository level.
 type ConditionParams struct {
-	AccountID uuid.UUID           `json:"account_id"`
 	Limit     string              `json:"limit"`
 	Offset    string              `json:"offset"`
 	Filter    []QuerySliceElement `json:"filter"`
@@ -24,6 +44,48 @@ type ConditionParams struct {
 type QuerySliceElement struct {
 	Key string
 	Val string
+}
+
+func (cp *ConditionParams) Prepare(c *gin.Context) error {
+	cp.CheckList.Export = true
+	cp.CheckList.Filter = true
+	cp.CheckList.Sort = true
+	cp.CheckList.Offset = true
+	cp.CheckList.Limit = true
+
+	cp.Limit = c.Query("limit")
+	cp.Offset = c.Query("offset")
+	cp.Export = c.Query("export")
+
+	for _, v := range c.QueryArray("f") {
+		keyval := strings.Split(v, ":")
+
+		var element QuerySliceElement
+
+		element.Key = keyval[0]
+		element.Val = keyval[1]
+
+		cp.Filter = append(cp.Filter, element)
+	}
+
+	for _, v := range c.QueryArray("s") {
+		keyval := strings.Split(v, ":")
+
+		var element QuerySliceElement
+
+		element.Key = keyval[0]
+		element.Val = keyval[1]
+
+		cp.Sort = append(cp.Sort, element)
+	}
+
+	cp.SetDefaultValues()
+
+	if err := cp.Validate(); err != nil {
+		return fmt.Errorf("query preparetion failed: %w", err)
+	}
+
+	return nil
 }
 
 type ListValidationFilds struct {
@@ -139,13 +201,6 @@ func (cp ConditionParams) Validate() error {
 	if cp.CheckList.Export {
 		if notInSlice(cp.Export, allowedExportValue) {
 			return fmt.Errorf("value %v: %w", cp.Export, ErrUnallowedExportValue)
-		}
-	}
-
-	if cp.CheckList.AccountID {
-		_, err := uuid.Parse(string(cp.AccountID.String()))
-		if err != nil {
-			return err
 		}
 	}
 

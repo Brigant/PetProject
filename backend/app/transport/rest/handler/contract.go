@@ -27,4 +27,5 @@ type MovieService interface {
 
 type ListsService interface {
 	Create(list core.MovieList) (string, error)
+	GetAllAccountLists(core.ConditionParams) ([]core.MovieList, error)
 }

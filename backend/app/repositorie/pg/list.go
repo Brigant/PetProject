@@ -43,32 +43,22 @@ func (d ListDB) Insert(list core.MovieList) (string, error) {
 	return listID, nil
 }
 
-func (d ListDB) SelectMovieListByAccountID(accountID string, queryParam core.ConditionParams) ([]core.MovieList, error) {
+func (d ListDB) SelectAllUsersLists(queryParam core.ConditionParams) ([]core.MovieList, error) {
 	var list []core.MovieList
 
-	query := ``
+	query := `SELECT * FROM public.list `
 
 	condition := buildQueryCondition(queryParam)
 
 	query += condition
 
-	rows, err := d.db.NamedQuery(query, &list)
-	if err != nil {
+	if err := d.db.Select(&list, query); err != nil {
 		pqErr := new(pq.Error)
-		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeUniqueViolation {
-			return nil, core.ErrDuplicateRow
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeUndefinedColumn {
+			return nil, core.ErrUnkownConditionKey
 		}
 
-		return nil, fmt.Errorf("insterting error: %w", err)
-	}
-	defer rows.Close()
-
-	var listID string
-
-	rows.Next()
-
-	if err := rows.Scan(&listID); err != nil {
-		return nil, fmt.Errorf("error while scaning: %w", err)
+		return nil, fmt.Errorf("an error occurs while getting the movie list: %w", err)
 	}
 
 	return list, nil

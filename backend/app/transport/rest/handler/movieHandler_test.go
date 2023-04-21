@@ -264,7 +264,7 @@ func TestMovie_get(t *testing.T) {
 			paramName: "id",
 			mockBehavior: func(s *MockMovieService, movieID string) {
 				s.EXPECT().Get(movieID).Return(core.Movie{},
-					core.ErrMovieNotFound)
+					core.ErrNotFound)
 			},
 			expectedStatusCode:   http.StatusNotFound,
 			expectedResponseBody: `{"error":"no movie was found"}`,
@@ -345,7 +345,7 @@ func TestMovie_getAll(t *testing.T) {
 			queryPath: "/movie/?f=genre:comedy",
 			mockBehavior: func(s *MockMovieService) {
 				s.EXPECT().GetList(gomock.Any()).Return(nil,
-					core.ErrMovieNotFound).Times(1)
+					core.ErrNotFound).Times(1)
 			},
 			expectedStatusCode:   http.StatusOK,
 			expectedResponseBody: `{"alert":"no movie was found"}`,

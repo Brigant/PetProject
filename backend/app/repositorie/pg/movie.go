@@ -60,7 +60,7 @@ func (d MovieDB) SelectMovieByID(movieID string) (core.Movie, error) {
 	var movie core.Movie
 	if err := d.db.Get(&movie, query, movieID); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return core.Movie{}, core.ErrMovieNotFound
+			return core.Movie{}, core.ErrNotFound
 		}
 
 		return core.Movie{}, fmt.Errorf("an error occurs while getting the movie: %w", err)
@@ -79,7 +79,7 @@ func (d MovieDB) SelectAllMovies(qp core.ConditionParams) ([]core.Movie, error) 
 	var movieList []core.Movie
 	if err := d.db.Select(&movieList, fullQuery); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, core.ErrMovieNotFound
+			return nil, core.ErrNotFound
 		}
 
 		return nil, fmt.Errorf("an error occurs while getting the movie list: %w", err)
