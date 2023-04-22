@@ -81,6 +81,8 @@ func (h *ListHandler) get(c *gin.Context) {
 }
 
 // Handler for the movie list getting of the athenticated accaount.
+// The path may cointain the query parameters. ex.:
+// /list/?type=wish&type=favorite
 func (h *ListHandler) getAll(c *gin.Context) {
 	accountID, ok := c.Get(userCtx)
 	if !ok {
@@ -90,18 +92,18 @@ func (h *ListHandler) getAll(c *gin.Context) {
 		return
 	}
 
-	var conditionParams core.ConditionParams
-
-	if err := conditionParams.Prepare(c); err != nil {
-		h.logger.Debugw("prepareQueryParams", "error", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-
-		return
+	filter := []core.QuerySliceElement{
+		{Key: "account_id", Val: accountID.(string)},
 	}
 
-	conditionParams.Filter = append(conditionParams.Filter, core.QuerySliceElement{Key: "account_id", Val: accountID.(string)})
+	for _, elem := range c.QueryArray("type") {
+		filter = append(filter, core.QuerySliceElement{
+			Key: "type",
+			Val: elem,
+		})
+	}
 
-	movieLists, err := h.service.GetAllAccountLists(conditionParams)
+	movieLists, err := h.service.GetAllAccountLists(filter)
 	if err != nil {
 		if errors.Is(err, core.ErrUnkownConditionKey) {
 			h.logger.Debugw("getAll hendler", "error", err.Error())

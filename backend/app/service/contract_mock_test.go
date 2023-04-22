@@ -325,7 +325,7 @@ func (mr *MockListSorageMockRecorder) Insert(arg0 interface{}) *gomock.Call {
 }
 
 // SelectAllUsersLists mocks base method.
-func (m *MockListSorage) SelectAllUsersLists(arg0 core.ConditionParams) ([]core.MovieList, error) {
+func (m *MockListSorage) SelectAllUsersLists(arg0 []core.QuerySliceElement) ([]core.MovieList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectAllUsersLists", arg0)
 	ret0, _ := ret[0].([]core.MovieList)

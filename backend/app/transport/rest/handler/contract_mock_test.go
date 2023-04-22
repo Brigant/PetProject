@@ -297,7 +297,7 @@ func (mr *MockListsServiceMockRecorder) Create(list interface{}) *gomock.Call {
 }
 
 // GetAllAccountLists mocks base method.
-func (m *MockListsService) GetAllAccountLists(arg0 core.ConditionParams) ([]core.MovieList, error) {
+func (m *MockListsService) GetAllAccountLists(arg0 []core.QuerySliceElement) ([]core.MovieList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllAccountLists", arg0)
 	ret0, _ := ret[0].([]core.MovieList)

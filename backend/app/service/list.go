@@ -23,8 +23,8 @@ func (s ListService) Create(list core.MovieList) (string, error) {
 	return listID, nil
 }
 
-func (s ListService) GetAllAccountLists(conditions core.ConditionParams) ([]core.MovieList, error) {
-	movieLists, err := s.storage.SelectAllUsersLists(conditions)
+func (s ListService) GetAllAccountLists(condtitions []core.QuerySliceElement) ([]core.MovieList, error) {
+	movieLists, err := s.storage.SelectAllUsersLists(condtitions)
 	if err != nil {
 		return nil, fmt.Errorf("select all users list got the error: %w", err)
 	}
