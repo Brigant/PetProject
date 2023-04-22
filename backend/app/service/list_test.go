@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestListService_create(t *testing.T) {
+func TestListService_Create(t *testing.T) {
 	type mockBehavior func(s *MockListSorage, list core.MovieList)
 
 	testCasesTable := map[string]struct {
@@ -61,6 +61,58 @@ func TestListService_create(t *testing.T) {
 			} else {
 				assert.NoError(t, err, "The error should be nil")
 				assert.Equal(t, testCase.expectedID, listID)
+			}
+		})
+	}
+}
+
+func TestListService_GetAllAccountLists(t *testing.T) {
+	type mockBehavior func(s *MockListSorage)
+
+	testCasesTable := map[string]struct {
+		mockBehavior         mockBehavior
+		expectedErrorMessage string
+		expected             []core.MovieList
+		wantError            bool
+	}{
+		"Successful": {
+			mockBehavior: func(s *MockListSorage) {
+				s.EXPECT().SelectAllUsersLists(gomock.Any()).Return([]core.MovieList{},
+					nil).Times(1)
+			},
+			expected:  []core.MovieList{},
+			wantError: false,
+		},
+		"Shoud be an error": {
+			mockBehavior: func(s *MockListSorage) {
+				s.EXPECT().SelectAllUsersLists(gomock.Any()).Return(
+					nil, errors.New("some error")).Times(1)
+			},
+			expectedErrorMessage: "select all users list got the error: some error",
+			wantError:            true,
+		},
+	}
+
+	for name, testCase := range testCasesTable {
+		t.Run(name, func(t *testing.T) {
+			// Init Deps
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			listStorage := NewMockListSorage(ctrl)
+			testCase.mockBehavior(listStorage)
+
+			ls := ListService{
+				storage: listStorage,
+			}
+
+			_, err := ls.GetAllAccountLists([]core.QuerySliceElement{})
+
+			if testCase.wantError {
+				assert.EqualError(t, err, testCase.expectedErrorMessage,
+					"We want get an error beceause the storage returned the error")
+			} else {
+				assert.NoError(t, err, "The error should be nil")
 			}
 		})
 	}

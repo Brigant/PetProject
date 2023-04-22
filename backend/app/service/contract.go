@@ -31,5 +31,5 @@ type MovieStorage interface {
 
 type ListSorage interface {
 	Insert(core.MovieList) (string, error)
-	SelectAllUsersLists(core.ConditionParams) ([]core.MovieList, error)
+	SelectAllUsersLists([]core.QuerySliceElement) ([]core.MovieList, error)
 }
