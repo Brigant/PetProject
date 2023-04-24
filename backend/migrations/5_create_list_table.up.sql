@@ -7,8 +7,7 @@ CREATE TABLE "list" (
     PRIMARY KEY ("id"),
     CONSTRAINT "unique_list_id" UNIQUE("id"),
     CONSTRAINT "unique_account_id_type" UNIQUE("account_id", "type"),
-    CONSTRAINT "movie_fk" FOREIGN KEY (movie_id) REFERENCES public."movie"(id),
-    CONSTRAINT "account_fk" FOREIGN KEY (account_id) REFERENCES public."account"(id)
+    CONSTRAINT "list_account_id_fk" FOREIGN KEY (account_id) REFERENCES public.account(id)
 );
 
 CREATE TRIGGER update_list_modtime 

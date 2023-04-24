@@ -15,7 +15,8 @@ type MovieList struct {
 }
 
 var (
-	ErrDuplicateRow       = errors.New("such record already exists")
-	ErrEmptyMovieListType = errors.New("the movie list type should't be empty")
-	ErrEpmtryMovieID      = errors.New("the movie ID should't be empty")
+	ErrDuplicateRow        = errors.New("such record already exists")
+	ErrEmptyMovieListType  = errors.New("the movie list type should't be empty")
+	ErrEpmtryMovieID       = errors.New("the movie ID should't be empty")
+	ErrForeignKeyViolation = errors.New("some value has no reference to the list or to the movie")
 )

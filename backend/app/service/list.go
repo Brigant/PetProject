@@ -31,3 +31,10 @@ func (s ListService) GetAllAccountLists(condtitions []core.QuerySliceElement) ([
 
 	return movieLists, nil
 }
+
+func (s ListService) AddMovieToList(listID, movieID string) error {
+	if err := s.storage.InsertMovieToList(listID, movieID); err != nil {
+		return fmt.Errorf("service add movie to list got error: %w", err)
+	}
+	return nil
+}

@@ -281,6 +281,20 @@ func (m *MockListsService) EXPECT() *MockListsServiceMockRecorder {
 	return m.recorder
 }
 
+// AddMovieToList mocks base method.
+func (m *MockListsService) AddMovieToList(movieID, listID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddMovieToList", movieID, listID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddMovieToList indicates an expected call of AddMovieToList.
+func (mr *MockListsServiceMockRecorder) AddMovieToList(movieID, listID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMovieToList", reflect.TypeOf((*MockListsService)(nil).AddMovieToList), movieID, listID)
+}
+
 // Create mocks base method.
 func (m *MockListsService) Create(list core.MovieList) (string, error) {
 	m.ctrl.T.Helper()

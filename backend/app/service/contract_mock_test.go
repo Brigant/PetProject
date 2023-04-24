@@ -324,6 +324,20 @@ func (mr *MockListSorageMockRecorder) Insert(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockListSorage)(nil).Insert), arg0)
 }
 
+// InsertMovieToList mocks base method.
+func (m *MockListSorage) InsertMovieToList(moviID, listID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertMovieToList", moviID, listID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InsertMovieToList indicates an expected call of InsertMovieToList.
+func (mr *MockListSorageMockRecorder) InsertMovieToList(moviID, listID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertMovieToList", reflect.TypeOf((*MockListSorage)(nil).InsertMovieToList), moviID, listID)
+}
+
 // SelectAllUsersLists mocks base method.
 func (m *MockListSorage) SelectAllUsersLists(arg0 []core.QuerySliceElement) ([]core.MovieList, error) {
 	m.ctrl.T.Helper()
