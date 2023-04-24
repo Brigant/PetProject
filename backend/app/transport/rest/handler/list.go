@@ -151,5 +151,5 @@ func (h ListHandler) movieToList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"action": "succesful"})
+	c.JSON(http.StatusCreated, gin.H{"action": "succesful"})
 }

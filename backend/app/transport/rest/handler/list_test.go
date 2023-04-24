@@ -211,3 +211,96 @@ func TestList_getAll(t *testing.T) {
 		})
 	}
 }
+
+func TestList_movieToList(t *testing.T) {
+	log, err := logger.New("DEBUG")
+	if err != nil {
+		t.FailNow()
+	}
+
+	type mockBehavior func(s *MockListsService)
+
+	testCasesTable := map[string]struct {
+		inputBody            string
+		mockBehavior         mockBehavior
+		expectedStatusCode   int
+		expectedResponseBody string
+	}{
+		"Successful case": {
+			inputBody: `{"list_id":"e018e175-7813-4969-a99a-ed234afb2dd9","movie_id":"ca160814-59b3-4d1d-8bae-e3772fa0c6fb"}`,
+			mockBehavior: func(s *MockListsService) {
+				s.EXPECT().AddMovieToList("e018e175-7813-4969-a99a-ed234afb2dd9", "ca160814-59b3-4d1d-8bae-e3772fa0c6fb").Return(nil).Times(1)
+			},
+			expectedStatusCode:   http.StatusCreated,
+			expectedResponseBody: `{"action":"succesful"}`,
+		},
+		"Unique error": {
+			inputBody: `{"list_id":"e018e175-7813-4969-a99a-ed234afb2dd9","movie_id":"ca160814-59b3-4d1d-8bae-e3772fa0c6fb"}`,
+			mockBehavior: func(s *MockListsService) {
+				s.EXPECT().AddMovieToList("e018e175-7813-4969-a99a-ed234afb2dd9", "ca160814-59b3-4d1d-8bae-e3772fa0c6fb").Return(
+					core.ErrDuplicateRow).Times(1)
+			},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"error":"such record already exists"}`,
+		},
+		"Foreign key violation": {
+			inputBody: `{"list_id":"e018e175-7813-4969-a99a-ed234afb2dd9","movie_id":"ca160814-59b3-4d1d-8bae-e3772fa0c6fb"}`,
+			mockBehavior: func(s *MockListsService) {
+				s.EXPECT().AddMovieToList("e018e175-7813-4969-a99a-ed234afb2dd9", "ca160814-59b3-4d1d-8bae-e3772fa0c6fb").Return(
+					core.ErrForeignKeyViolation).Times(1)
+			},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"error":"some value has no reference to the list or to the movie"}`,
+		},
+		"Empty list_id": {
+			inputBody: `{"movie_id":"ca160814-59b3-4d1d-8bae-e3772fa0c6fb"}`,
+			mockBehavior: func(s *MockListsService) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"error":"Key: 'requesMovieList.ListID' Error:Field validation for 'ListID' failed on the 'required' tag"}`,
+		},
+		"Empty movie_id": {
+			inputBody: `{"movie_id":"ca160814-59b3-4d1d-8bae-e3772fa0c6fb"}`,
+			mockBehavior: func(s *MockListsService) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"error":"Key: 'requesMovieList.ListID' Error:Field validation for 'ListID' failed on the 'required' tag"}`,
+		},
+		"Wrong movieID": {
+			inputBody: `{"list_id":"e018e175-7813-4969-a99a-ed234afb2dd9","movie_id":"a160814-59b3-4d1d-8bae-e3772fa0c6fb"}`,
+			mockBehavior: func(s *MockListsService) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"error":"invalid UUID length: 35"}`,
+		},
+		"Wrong listID": {
+			inputBody: `{"list_id":"e018e175-7813-4969-a99a-ed234afb2dd","movie_id":"ca160814-59b3-4d1d-8bae-e3772fa0c6fb"}`,
+			mockBehavior: func(s *MockListsService) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"error":"invalid UUID length: 35"}`,
+		},
+	}
+
+	for name, testCase := range testCasesTable {
+		t.Run(name, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			listService := NewMockListsService(ctrl)
+			testCase.mockBehavior(listService)
+
+			lh := NewListHandler(listService, log)
+
+			response := httptest.NewRecorder()
+			ctx, router := gin.CreateTestContext(response)
+
+			router.POST("/list/add", lh.movieToList)
+
+			ctx.Request = httptest.NewRequest(http.MethodPost, "/list/add", strings.NewReader(testCase.inputBody))
+
+			router.ServeHTTP(response, ctx.Request)
+
+			assert.Equal(t, testCase.expectedStatusCode, response.Code)
+			assert.Equal(t, testCase.expectedResponseBody, response.Body.String())
+		})
+	}
+}
