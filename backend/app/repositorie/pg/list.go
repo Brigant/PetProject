@@ -19,8 +19,8 @@ func NewListDB(db *sqlx.DB) ListDB {
 }
 
 func (d ListDB) Insert(list core.MovieList) (string, error) {
-	query := `INSERT INTO public.list(type, account_id, movie_id)
-		VALUES(:type, :account_id, :movie_id) RETURNING id`
+	query := `INSERT INTO public.list(type, account_id)
+		VALUES(:type, :account_id) RETURNING id`
 
 	rows, err := d.db.NamedQuery(query, &list)
 	if err != nil {

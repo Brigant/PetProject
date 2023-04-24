@@ -1,6 +1,5 @@
 CREATE TABLE "list" (
     "id" uuid DEFAULT gen_random_uuid() NOT NULL,
-    "movie_id" uuid NOT NULL,
     "account_id" uuid NOT NULL,
     "type" VARCHAR(255) NOT NULL,
     "created" Timestamp With Time Zone NOT NULL DEFAULT NOW(),

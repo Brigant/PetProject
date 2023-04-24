@@ -31,7 +31,7 @@ func TestList_create(t *testing.T) {
 		expectedResponseBody string
 	}{
 		"Successful case": {
-			inputBody: `{"type":"favorite","movie_id":"6b823d5e-3d37-4617-a568-226e2e31a4f4"}`,
+			inputBody: `{"type":"favorite"}`,
 			accountID: "8c172d76-f750-4369-a5e2-27c877299168",
 			userCtx:   userCtx,
 			mockBehavior: func(s *MockListsService) {
@@ -41,7 +41,7 @@ func TestList_create(t *testing.T) {
 			expectedResponseBody: `{"created with ID":"8c172d76-f750-4369-a5e2-27c877299168"}`,
 		},
 		"Wrong context": {
-			inputBody:            `{"type":"favorite","movie_id":"6b823d5e-3d37-4617-a568-226e2e31a4f4"}`,
+			inputBody:            `{"type":"favorite"}`,
 			accountID:            "8c172d76-f750-4369-a5e2-27c877299168",
 			userCtx:              "wrong",
 			mockBehavior:         func(s *MockListsService) {},
@@ -49,7 +49,7 @@ func TestList_create(t *testing.T) {
 			expectedResponseBody: `{"error":"no account found in contex"}`,
 		},
 		"Wrong accountID context": {
-			inputBody:            `{"type":"favorite","movie_id":"6b823d5e-3d37-4617-a568-226e2e31a4f4"}`,
+			inputBody:            `{"type":"favorite"}`,
 			accountID:            "",
 			userCtx:              userCtx,
 			mockBehavior:         func(s *MockListsService) {},
@@ -57,20 +57,12 @@ func TestList_create(t *testing.T) {
 			expectedResponseBody: `{"error":"invalid UUID length: 0"}`,
 		},
 		"Bad type": {
-			inputBody:            `{"movie_id":"6b823d5e-3d37-4617-a568-226e2e31a4f4"}`,
+			inputBody:            `{}`,
 			accountID:            "8c172d76-f750-4369-a5e2-27c877299168",
 			userCtx:              userCtx,
 			mockBehavior:         func(s *MockListsService) {},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"error":"the movie list type should't be empty"}`,
-		},
-		"Bad movieID": {
-			inputBody:            `{"type":"favorite"}`,
-			accountID:            "8c172d76-f750-4369-a5e2-27c877299168",
-			userCtx:              userCtx,
-			mockBehavior:         func(s *MockListsService) {},
-			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"error":"the movie ID should't be empty"}`,
 		},
 	}
 

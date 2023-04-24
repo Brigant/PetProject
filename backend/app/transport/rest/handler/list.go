@@ -51,13 +51,6 @@ func (h *ListHandler) create(c *gin.Context) {
 
 	list.AccountID = accountID
 
-	if err := list.Validate(); err != nil {
-		h.logger.Debugw("list validation: %w", err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-
-		return
-	}
-
 	listID, err := h.service.Create(list)
 	if err != nil {
 		if errors.Is(err, core.ErrDuplicateRow) {
