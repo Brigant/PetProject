@@ -94,6 +94,7 @@ func (h *Handler) InitRouter(mode string) *gin.Engine {
 		list.POST("/", h.List.create)
 		list.GET("/:id", h.List.get)
 		list.GET("/", h.List.getAll)
+		list.POST("/add", h.List.movieToList)
 	}
 
 	return router

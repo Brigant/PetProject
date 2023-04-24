@@ -28,4 +28,5 @@ type MovieService interface {
 type ListsService interface {
 	Create(list core.MovieList) (string, error)
 	GetAllAccountLists([]core.QuerySliceElement) ([]core.MovieList, error)
+	AddMovieToList(movieID, listID string) error
 }

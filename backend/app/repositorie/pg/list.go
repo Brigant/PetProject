@@ -44,6 +44,42 @@ func (d ListDB) Insert(list core.MovieList) (string, error) {
 	return listID, nil
 }
 
+func (d ListDB) InsertMovieToList(listID, moviID string) error {
+	const expectedAffectedRows = 1
+
+	query := `INSERT INTO movie_list(list_id, movie_id) 
+		VALUES($1, $2)`
+
+	fmt.Println(listID, moviID)
+	result, err := d.db.Exec(query, listID, moviID)
+	if err != nil {
+		pqError := new(pq.Error)
+		if errors.As(err, &pqError) {
+			if pqError.Code.Name() == ErrCodeUniqueViolation {
+				return core.ErrDuplicateRow
+			}
+
+			if pqError.Code.Name() == ErrCodeForeignKeyViolation {
+				return core.ErrForeignKeyViolation
+			}
+		}
+
+
+		return fmt.Errorf("insert to movie_list got the error: %w", err)
+	}
+
+	affectedRow, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("can't get affected row: %w", err)
+	}
+
+	if affectedRow != expectedAffectedRows {
+		return fmt.Errorf("affected row not equal to %v", expectedAffectedRows)
+	}
+
+	return nil
+}
+
 func (d ListDB) SelectAllUsersLists(conditions []core.QuerySliceElement) ([]core.MovieList, error) {
 	var list []core.MovieList
 

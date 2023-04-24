@@ -121,3 +121,35 @@ func (h *ListHandler) getAll(c *gin.Context) {
 
 	c.JSON(http.StatusOK, movieLists)
 }
+
+type requesMovieList struct {
+	ListID  uuid.UUID `json:"list_id" db:"list_id" binding:"required"`
+	MovieID uuid.UUID `json:"movie_id" db:"movie_id" binding:"required"`
+}
+
+func (h ListHandler) movieToList(c *gin.Context) {
+	input := requesMovieList{}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		h.logger.Debugw("Handler movieToList -> ShouldBindJSON", "error", err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	if err := h.service.AddMovieToList(input.ListID.String(), input.MovieID.String()); err != nil {
+		if errors.Is(err, core.ErrDuplicateRow) || errors.Is(err, core.ErrForeignKeyViolation) {
+			h.logger.Debugw("Handler movieToList -> AddMovieToList", "error", err.Error())
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+			return
+		}
+
+		h.logger.Debugw("Handler movieToList -> AddMovieToList", "error", err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"action": "succesful"})
+}
