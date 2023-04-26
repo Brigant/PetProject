@@ -30,7 +30,6 @@ var (
 
 func SHA256(password, salt string) string {
 	sum := sha256.Sum256([]byte(password + salt))
-	fmt.Println("---------------------*************", salt)
 
 	return fmt.Sprintf("%x", sum)
 }

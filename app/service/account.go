@@ -42,6 +42,7 @@ type Claims struct {
 // of the new created account or an error if it occures.
 func (a AccountService) CreateUser(account core.Account) (string, error) {
 	account.Password = core.SHA256(account.Password, a.cfg.Salt)
+
 	id, err := a.storage.InsertAccount(account)
 	if err != nil {
 		return "", fmt.Errorf("service CreateUser get an error: %w", err)
@@ -50,7 +51,7 @@ func (a AccountService) CreateUser(account core.Account) (string, error) {
 	return id, nil
 }
 
-// The service implementaion of login functionality.
+// The service implementation of login functionality.
 func (a AccountService) Login(phone, password string, session core.Session) (core.TokenPair, error) {
 	var tokenPair core.TokenPair
 

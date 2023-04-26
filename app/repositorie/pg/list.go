@@ -50,7 +50,6 @@ func (d ListDB) InsertMovieToList(listID, moviID string) error {
 	query := `INSERT INTO movie_list(list_id, movie_id) 
 		VALUES($1, $2)`
 
-	fmt.Println(listID, moviID)
 	result, err := d.db.Exec(query, listID, moviID)
 	if err != nil {
 		pqError := new(pq.Error)
@@ -64,7 +63,6 @@ func (d ListDB) InsertMovieToList(listID, moviID string) error {
 			}
 		}
 
-
 		return fmt.Errorf("insert to movie_list got the error: %w", err)
 	}
 
@@ -74,7 +72,7 @@ func (d ListDB) InsertMovieToList(listID, moviID string) error {
 	}
 
 	if affectedRow != expectedAffectedRows {
-		return fmt.Errorf("affected row not equal to %v", expectedAffectedRows)
+		return core.ErrNoRowsEffected
 	}
 
 	return nil
@@ -88,8 +86,6 @@ func (d ListDB) SelectAllUsersLists(conditions []core.QuerySliceElement) ([]core
 	where := d.prepareCond(conditions)
 
 	fullQuery := query + where
-
-	fmt.Println(fullQuery)
 
 	if err := d.db.Select(&list, fullQuery); err != nil {
 		pqErr := new(pq.Error)

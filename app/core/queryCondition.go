@@ -38,7 +38,7 @@ type ConditionParams struct {
 	Filter    []QuerySliceElement `json:"filter"`
 	Sort      []QuerySliceElement `json:"sort"`
 	Export    string              `json:"export"`
-	CheckList ListValidationFilds `json:"chek_list"`
+	CheckList ListValidationFilds `json:"check_list"`
 }
 
 type QuerySliceElement struct {

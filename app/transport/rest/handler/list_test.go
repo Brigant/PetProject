@@ -232,7 +232,7 @@ func TestList_movieToList(t *testing.T) {
 				s.EXPECT().AddMovieToList("e018e175-7813-4969-a99a-ed234afb2dd9", "ca160814-59b3-4d1d-8bae-e3772fa0c6fb").Return(nil).Times(1)
 			},
 			expectedStatusCode:   http.StatusCreated,
-			expectedResponseBody: `{"action":"succesful"}`,
+			expectedResponseBody: `{"action":"successful"}`,
 		},
 		"Unique error": {
 			inputBody: `{"list_id":"e018e175-7813-4969-a99a-ed234afb2dd9","movie_id":"ca160814-59b3-4d1d-8bae-e3772fa0c6fb"}`,

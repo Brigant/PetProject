@@ -106,8 +106,8 @@ func (h AccountHandler) login(c *gin.Context) {
 	c.JSON(http.StatusOK, tokenPair)
 }
 
-// Handler wich gives the new pair of the tokens
-// if the refresh token is provided
+// Handler which gives the new pair of the tokens
+// if the refresh token is provided.
 func (h AccountHandler) refreshToken(c *gin.Context) {
 	var inputToken inputRefreshToken
 

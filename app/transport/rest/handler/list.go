@@ -75,7 +75,7 @@ func (h *ListHandler) get(c *gin.Context) {
 
 // Handler for the movie list getting of the athenticated accaount.
 // The path may cointain the query parameters. ex.:
-// /list/?type=wish&type=favorite
+// /list/?type=wish&type=favorite .
 func (h *ListHandler) getAll(c *gin.Context) {
 	accountID, ok := c.Get(userCtx)
 	if !ok {
@@ -103,7 +103,6 @@ func (h *ListHandler) getAll(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
 			return
-
 		}
 
 		h.logger.Debugw("getAll hendler", "error", err.Error())
@@ -151,5 +150,5 @@ func (h ListHandler) movieToList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"action": "succesful"})
+	c.JSON(http.StatusCreated, gin.H{"action": "succesfful"})
 }
