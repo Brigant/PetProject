@@ -28,7 +28,7 @@ services:
         psql:
           condition: service_healthy
       volumes:
-        - ${MIGRATIONS_HOST_PATH:-./backend/migrations}:/migrations
+        - ${MIGRATIONS_HOST_PATH:-./migrations}:/migrations
       command:
          [
           "-path",
