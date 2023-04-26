@@ -28,7 +28,7 @@ func NewServer(port string, router http.Handler) *Server {
 }
 
 func SetupAndRun() error {
-	cfg, err := config.InitConfig()
+	cfg, err := config.InitConfig("config")
 	if err != nil {
 		return fmt.Errorf("cannot read config: %w", err)
 	}

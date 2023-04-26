@@ -4,7 +4,7 @@ GORUN=$(GOCMD) run
 GOBUILD=$(GOCMD) build
 GOLINTCMD=golangci-lint
 LINTRUN=$(GOLINTCMD) run
-TESTRUN=$(COMCD) test
+TESTRUN=$(GOCMD) test
 ENTRYPOINT=cmd/main.go
 BINARY_NAME=petproject
 

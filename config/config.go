@@ -44,8 +44,8 @@ const (
 
 var errNotAllowedLoggelLevel = errors.New("not allowed logger level")
 
-func InitConfig() (Config, error) {
-	viper.AddConfigPath("config")
+func InitConfig(path string) (Config, error) {
+	viper.AddConfigPath(path)
 	viper.SetConfigName("config")
 
 	viper.AutomaticEnv()

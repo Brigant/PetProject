@@ -2,10 +2,13 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"testing"
 	"time"
 
 	"github.com/Brigant/PetPorject/app/core"
+	"github.com/Brigant/PetPorject/config"
 	"github.com/golang-jwt/jwt"
 	gomock "github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -13,6 +16,12 @@ import (
 
 func TestService_CreateUser(t *testing.T) {
 	type mockBehavior func(s *MockAccountStorage, account core.Account)
+	cfg, err := config.InitConfig("../../config")
+	if err != nil {
+		log.Println(err.Error())
+
+		t.FailNow()
+	}
 
 	testCasesTable := map[string]struct {
 		account              core.Account
@@ -29,7 +38,7 @@ func TestService_CreateUser(t *testing.T) {
 				Role:     "admin",
 			},
 			mockBehavior: func(s *MockAccountStorage, account core.Account) {
-				s.EXPECT().InsertAccount(account).Return("id-111", nil)
+				s.EXPECT().InsertAccount(gomock.Any()).Return("id-111", nil)
 			},
 			expectedResult:       "id-111",
 			expectedErrorMessage: "",
@@ -43,7 +52,7 @@ func TestService_CreateUser(t *testing.T) {
 				Role:     "admin",
 			},
 			mockBehavior: func(s *MockAccountStorage, account core.Account) {
-				s.EXPECT().InsertAccount(account).Return("", errors.New("XXX"))
+				s.EXPECT().InsertAccount(gomock.Any()).Return("", errors.New("XXX"))
 			},
 			expectedResult:       "",
 			expectedErrorMessage: "service CreateUser get an error: XXX",
@@ -62,7 +71,10 @@ func TestService_CreateUser(t *testing.T) {
 
 			accountService := AccountService{
 				storage: AccountStorage,
+				cfg:     cfg,
 			}
+
+			fmt.Println(accountService.cfg.Salt)
 
 			result, err := accountService.CreateUser(testCase.account)
 
