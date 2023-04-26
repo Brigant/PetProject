@@ -5,7 +5,7 @@ GOBUILD=$(GOCMD) build
 GOLINTCMD=golangci-lint
 LINTRUN=$(GOLINTCMD) run
 TESTRUN=$(COMCD) test
-ENTRYPOINT=backend/cmd/main.go
+ENTRYPOINT=cmd/main.go
 BINARY_NAME=petproject
 
 # Define targets
