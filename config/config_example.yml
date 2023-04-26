@@ -3,9 +3,16 @@
 # You may redifine it using os enirenment,
 # for ex.: export SERVER_MODE=release 
 
-loglevel: DEBUG # Available values: INFO, DEBUG, ERROR  
-access_token_ttl: 15 # minutes
+loglevel: DEBUG # Available values: INFO, DEBUG, ERROR 
+access_token_ttl: 10 # minutes
 refresh_token_ttl: 24 # hours
+signing_key: sdFWlnxb13t&refgedgdfjsdgbv
+
+# WARNING !!!
+# Be careful with changing this parameter. You shoudl set it once at 
+# the start of deploying, and after never change it. Changing after
+# will result in clients not being able to login.
+salt: sdfwevdweertgsadf 
 
 
 server:
