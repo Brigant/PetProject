@@ -1,0 +1,478 @@
+{
+	"info": {
+		"_postman_id": "6be43270-65b2-469d-accb-f4142979cb54",
+		"name": "VideoApiCollection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6069470"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "signUp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\":\"+39099999999\",\n    \"password\":\"password1234\",\n    \"age\":15,\n    \"role\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\":\"+39099999999\",\n    \"password\":\"password1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refreshToken",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"RefreshToken\": \"29543b89-ccb2-45c2-80f8-0be17cf1ae16\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODA1MjY5MjAsImlhdCI6MTY4MDUyNjAyMCwiSW5mbyI6eyJBY2NvdW50SUQiOiI1MzdmYjNkZC1kOTVlLTQzOWUtYjVkOC03YzJhMDhjMTY4NjYiLCJSb2xlIjoiYWRtaW4iLCJSZWZyZXNoVG9rZW4iOiI1MTYwZTk5Ni1kZWFlLTQxOWMtYTYwNS05YjVlYzNkNmM3ZDYiLCJSZXF1ZXN0SG9zdCI6ImxvY2FsaG9zdDo4MDgwIiwiVXNlckFnZW50IjoiUG9zdG1hblJ1bnRpbWUvNy4zMS4zIiwiQ2xpZW50SVAiOiI6OjEifX0.Do_8Cah1Hegpen4rcDeY5ShgtbsePswmgO23XnzMihM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "director",
+			"item": [
+				{
+					"name": "add one director",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"James Kameron\",\n    \"birth_date\":\"1985-01-30\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/director",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"director"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "directorList",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/director/all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"director",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "director by ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/director/7057a043-94d5-4b52-b6e1-810015cd6569",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"director",
+								"7057a043-94d5-4b52-b6e1-810015cd6569"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "movie",
+			"item": [
+				{
+					"name": "Create Movie",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"Avata\",\n    \"genre\":\"Adventure\",\n    \"director_id\": \"7057a043-94d5-4b52-b6e1-810015cd6569\",\n    \"rate\":10,\n    \"release_date\":\"2023-03-01\",\n    \"duration\":8000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/movie/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movie",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Movie",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"Avatar2\",\n    \"ganre\":\"Adventure\",\n    \"director\": { \"id\":\"bed41cca-ee04-4975-ad7e-5b142e8a9306\"},\n    \"rate\":1,\n    \"release_date\":\"2023-01-01\",\n    \"duration\":10800\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/movie/ca160814-59b3-4d1d-8bae-e3772fa0c6fb",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movie",
+								"ca160814-59b3-4d1d-8bae-e3772fa0c6fb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Movies List",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/movie/?offset=0&f=genre:Adventure&f=rate:3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"movie",
+								""
+							],
+							"query": [
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "f",
+									"value": "genre:Adventure"
+								},
+								{
+									"key": "f",
+									"value": "rate:3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "list",
+			"item": [
+				{
+					"name": "Create list",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"wish\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account List",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"Avatar2\",\n    \"ganre\":\"Adventure\",\n    \"director\": { \"id\":\"bed41cca-ee04-4975-ad7e-5b142e8a9306\"},\n    \"rate\":1,\n    \"release_date\":\"2023-01-01\",\n    \"duration\":10800\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/list/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"list",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add Movie to List",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"list_id\":\"e018e175-7813-4969-a99a-ed234afb2dd9\",\n    \"movie_id\":\"ca160814-59b3-4d1d-8bae-e3772fa0c6fb\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/list/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"list",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/list/bb1bd2d4-525a-4a9b-a94b-474bcab949a7",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"list",
+								"bb1bd2d4-525a-4a9b-a94b-474bcab949a7"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODI1NjU5MzUsImlhdCI6MTY4MjQ3OTUzNSwiSW5mbyI6eyJBY2NvdW50SUQiOiIwOTQ0NTEzNi0zOTNhLTQ2NmUtODI3MS01MjJkNmVmODdkZjgiLCJSb2xlIjoiYWRtaW4iLCJSZWZyZXNoVG9rZW4iOiJmZDE5NzAwYi0wOTFkLTQyZGItODQ0Mi1mZWEzYTMwMjNhNWEiLCJSZXF1ZXN0SG9zdCI6ImxvY2FsaG9zdDo4MDgwIiwiVXNlckFnZW50IjoiUG9zdG1hblJ1bnRpbWUvNy4zMi4yIiwiQ2xpZW50SVAiOiI6OjEifX0._w1RXPSysrHe8TDQbG_DTcvW_ZA5gzD0YWRx5KlU7wA",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
